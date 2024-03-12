@@ -16,10 +16,14 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
-    String username;
+    @Column(name = "username",nullable = false, unique = true)
+    String userName;
+    @Column(nullable = false)
     String password;
-    String firstname;
-    String lastname;
+    @Column(name = "firstname")
+    String firstName;
+    @Column(name = "lastname")
+    String lastName;
     @Enumerated(value = EnumType.STRING)
     Role role;
 

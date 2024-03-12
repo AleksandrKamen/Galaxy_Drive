@@ -1,5 +1,6 @@
 ext {
     versions = [
-            'testcontainers': '1.19.6'
+            'testcontainers': '1.19.6',
+            'mapstruct':'1.5.5.Final'
     ]
 }
