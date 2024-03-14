@@ -26,6 +26,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation "org.mapstruct:mapstruct:${versions.mapstruct}"
+    implementation"io.minio:minio:${versions.minio}"
 
     annotationProcessor "org.mapstruct:mapstruct:${versions.mapstruct}"
 
