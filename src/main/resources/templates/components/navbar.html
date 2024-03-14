@@ -1,0 +1,61 @@
+<body>
+<div th:fragment="navbar">
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+        <div class="container-fluid">
+            <a class="navbar-brand" th:href="@{/}" data-toggle="tooltip"
+               th:title="#{navbar.back.to.home.page}" th:text="#{navbar.title}"></a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarSupportedContent"
+                    aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul th:if="${userLogin} == null" class="navbar-nav me-auto mb-2 mb-lg-0 top-menu">
+                    <li class="nav-item">
+                        <a class="nav-link" href="registration" th:text="#{navbar.registration}"></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="login" th:text="#{navbar.authorization}"></a>
+                    </li>
+                </ul>
+
+                <ul th:if="${userLogin}" class="navbar-nav ms-auto mb-2 mb-lg-0 top-menu">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-toggle="tooltip" th:title="#{navbar.personal.account}" data-bs-toggle="modal"
+                           data-bs-target="#modal-cart">
+                            <i class="fa-solid fa-user"></i>
+                        </a>
+                    </li>
+                    <!-- Modal -->
+                    <div class="modal fade" id="modal-cart" tabindex="-1" aria-labelledby="modalLabel"
+                         aria-hidden="true">
+                        <div class="modal-dialog modal-xl">
+                            <div class="modal-content">
+                                <div class="modal-header bg-secondary text-white">
+                                    <h1 class="modal-title fs-5" id="modalLabel" th:text="#{navbar.personal.account}"></h1>
+                                    <button type="button" class="btn-close-modal" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p th:text="'Имя пользователя - ' + ${userLogin}"></p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal" th:text="#{navbar.modal.close.btn}"></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Modal -->
+                    <li class="nav-item">
+                        <form action="/logout" method="post"
+                              class="nav-link">
+                            <button type="submit" class="icon-button" data-toggle="tooltip" th:title="#{navbar.exit.link}">
+                                <i class="fa-solid fa-arrow-right-from-bracket"></i></button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+</div>
+</body>

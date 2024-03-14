@@ -1,0 +1,37 @@
+<body>
+<div class="container mt-auto">
+    <div th:fragment="popup" class="popup product-card" id="popup">
+        <div class="popup-content text-center">
+            <button type="button" class="btn-close" aria-label="Close" id="close-popup"></button>
+            <h6 th:text="#{popup.title}"></h6>
+            <p th:text="#{popup.message}"></p>
+            <div class="popup-buttons d-grid gap-2 d-md-block">
+                <button type="button" class="btn btn-primary" aria-label="Close" id="accept" th:text="#{popup.accept}"></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var popup = document.getElementById("popup");
+        var closeButton = document.getElementById("close-popup");
+        var acceptButton = document.getElementById("accept");
+
+        if (document.cookie.indexOf("popupShown=true") === -1) {
+            popup.style.display = "block";
+        }
+        acceptButton.addEventListener("click", function () {
+            popup.style.display = "none";
+            document.cookie = "popupShown=true; expires=" + new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toUTCString();
+        });
+
+        closeButton.addEventListener("click", function () {
+            popup.style.display = "none";
+            document.cookie = "popupShown=true; expires=" + new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toUTCString();
+        });
+    });
+</script>
+
+
+</body>
