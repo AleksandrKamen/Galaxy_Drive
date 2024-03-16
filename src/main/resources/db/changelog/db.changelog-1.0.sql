@@ -8,5 +8,6 @@ CREATE TABLE IF NOT EXISTS users
   password VARCHAR(128) NOT NULL,
   firstname VARCHAR(64),
   lastname VARCHAR(64),
-  role VARCHAR(32)
+  role VARCHAR(32),
+  signup_method VARCHAR(32)
 );

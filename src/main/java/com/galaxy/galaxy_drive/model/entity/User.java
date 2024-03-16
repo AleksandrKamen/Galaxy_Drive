@@ -26,5 +26,7 @@ public class User {
     String lastName;
     @Enumerated(value = EnumType.STRING)
     Role role;
+    @Enumerated(value = EnumType.STRING)
+    SignupMethod signupMethod;
 
 }

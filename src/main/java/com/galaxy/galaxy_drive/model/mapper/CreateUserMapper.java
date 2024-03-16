@@ -2,6 +2,7 @@ package com.galaxy.galaxy_drive.model.mapper;
 
 import com.galaxy.galaxy_drive.model.dto.UserCreateDto;
 import com.galaxy.galaxy_drive.model.entity.Role;
+import com.galaxy.galaxy_drive.model.entity.SignupMethod;
 import com.galaxy.galaxy_drive.model.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,6 +19,7 @@ public class CreateUserMapper implements Mapper<UserCreateDto, User> {
                 .userName(object.getUserName())
                 .password(passwordEncoder.encode(object.getRawPassword()))
                 .role(Role.USER)
+                .signupMethod(SignupMethod.EMAIL)
                 .build();
     }
 }

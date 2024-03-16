@@ -6,11 +6,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest;
+import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
@@ -18,10 +20,10 @@ import org.springframework.security.web.SecurityFilterChain;
 @RequiredArgsConstructor
 public class SecurityConfiguration {
     private final UserService userService;
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests((authz) -> authz
+        http.authorizeHttpRequests((authz) -> authz
                         .requestMatchers("/login", "/registration").permitAll()
                         .requestMatchers("/css/**", "/picture/**").permitAll()
                         .anyRequest().authenticated())
@@ -29,23 +31,28 @@ public class SecurityConfiguration {
                         .defaultSuccessUrl("/", true))
                 .oauth2Login(config -> config
                         .loginPage("/login")
-                        .userInfoEndpoint(userInfo -> userInfo.oidcUserService(oAuth2UserService()))
+                        .userInfoEndpoint(userInfo -> userInfo
+                                .oidcUserService(oidcUserService())
+                                .userService(oauth2UserService()))
                         .defaultSuccessUrl("/", true));
 
         return http.build();
     }
 
-    private OAuth2UserService<OidcUserRequest, OidcUser> oAuth2UserService(){
+    private OAuth2UserService<OidcUserRequest, OidcUser> oidcUserService() {
         return userRequest -> {
-            var email = userRequest.getIdToken().getEmail();
-            var name = userRequest.getIdToken().getGivenName();
-            var familyName = userRequest.getIdToken().getFamilyName();
-            userService.createUserIfNotExist(email,name, familyName);
-            var userDetails = userService.loadUserByUsername(email);
+            userService.createUserIfNotExist(userRequest);
+            var userDetails = userService.loadUserByUsername(userRequest.getIdToken().getEmail());
             return new DefaultOidcUser(userDetails.getAuthorities(), userRequest.getIdToken());
         };
 
     }
 
-
+    private OAuth2UserService<OAuth2UserRequest, OAuth2User> oauth2UserService() {
+        return userRequest -> {
+            OAuth2User oauth2User = new DefaultOAuth2UserService().loadUser(userRequest);
+            userService.createUserIfNotExist(oauth2User);
+            return oauth2User;
+        };
+    }
 }

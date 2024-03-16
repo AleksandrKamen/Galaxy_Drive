@@ -15,7 +15,7 @@
                     <span th:text="#{registration.question.about.account}" class="me-2"></span>
                     <a href="login" th:text="#{registration.authorization.link}"></a>
                 </h6>
-                <form action="registration" method="post" enctype="application/x-www-form-urlencoded">
+                <form th:action="@{registration}" method="post" enctype="application/x-www-form-urlencoded">
                     <div class="mb-3">
                         <label for="userName" class="form-label" th:text="#{user.name}"></label>
                         <div class="input-group">
