@@ -30,7 +30,7 @@ public class SecurityConfiguration {
                 .formLogin(login -> login.loginPage("/login")
                         .defaultSuccessUrl("/", true))
                 .oauth2Login(config -> config
-                        .loginPage("/login")
+                        .loginPage("/")
                         .userInfoEndpoint(userInfo -> userInfo
                                 .oidcUserService(oidcUserService())
                                 .userService(oauth2UserService()))
