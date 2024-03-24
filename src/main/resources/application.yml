@@ -12,7 +12,6 @@ spring:
       ddl-auto: validate
     show-sql: true
     open-in-view: false
-
   session:
     store-type: redis
     timeout: 1800
@@ -33,6 +32,11 @@ spring:
             scope:
               - user:email
               - read:user
+  servlet:
+    multipart:
+      max-request-size: 100MB
+      max-file-size: 100MB
+
 minio:
   bucket: ${MINIO_BUCKET}
   url: ${MINIO_URL}

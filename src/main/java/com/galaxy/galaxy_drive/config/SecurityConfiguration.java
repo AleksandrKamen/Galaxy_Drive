@@ -25,17 +25,16 @@ public class SecurityConfiguration {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests((authz) -> authz
                         .requestMatchers("/login", "/registration").permitAll()
-                        .requestMatchers("/css/**", "/picture/**").permitAll()
+                        .requestMatchers("/css/**", "/picture/**", "/js/**").permitAll()
                         .anyRequest().authenticated())
                 .formLogin(login -> login.loginPage("/login")
                         .defaultSuccessUrl("/", true))
                 .oauth2Login(config -> config
-                        .loginPage("/")
+                        .loginPage("/login")
                         .userInfoEndpoint(userInfo -> userInfo
                                 .oidcUserService(oidcUserService())
                                 .userService(oauth2UserService()))
                         .defaultSuccessUrl("/", true));
-
         return http.build();
     }
 
