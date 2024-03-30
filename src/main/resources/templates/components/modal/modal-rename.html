@@ -1,0 +1,24 @@
+<body>
+<div class="modal fade" id="renameModal" tabindex="-1" aria-labelledby="renameModal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="renameModalLabel" th:text="#{rename.modal.title}"></h1>
+            </div>
+            <form th:action="@{/rename}" method="post">
+                <div class="modal-body">
+                    <input type="hidden" name="type" >
+                    <input type="hidden" name="currentName">
+                    <input type="text" name="newName" required>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                            th:text="#{rename.modal.cancel}">
+                    </button>
+                    <button type="submit" class="btn btn-primary" th:text="#{rename.modal.ok}"></button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
