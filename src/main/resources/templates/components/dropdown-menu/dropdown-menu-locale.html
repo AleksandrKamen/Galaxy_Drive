@@ -1,0 +1,26 @@
+<body>
+<div class="dropdown" id="dropdown-menu-locale" >
+    <form action="" class="nav-link" data-toggle="tooltip" th:title="#{navbar.lang}">
+        <input type="hidden" th:if="${path}" name="path" th:value="${path}">
+        <input type="hidden" th:if="${query}" name="query" th:value="${query}">
+
+        <button class="btn  icon-button" type="button" id="dropdownMenu2" data-bs-toggle="dropdown"
+                aria-expanded="false">
+            <i class="fa-solid fa-language"></i>
+        </button>
+
+        <ul class="dropdown-menu dropdown-menu-end">
+            <li>
+                <button type="submit" class="dropdown-item rename-btn" name="locale" value="en_US">
+                    <span>EN</span>
+                </button>
+            </li>
+            <li>
+                <button type="submit" id="rename-file-btn" class="dropdown-item rename-btn" name="locale" value="ru_RU">
+                    <span>RU</span>
+                </button>
+            </li>
+        </ul>
+    </form>
+</div>
+</body>
