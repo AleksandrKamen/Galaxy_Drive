@@ -1,0 +1,13 @@
+/*create-menu*/
+.create-menu{
+    width: 10%;
+    text-align: center;
+    margin-left: 2vw;
+}
+.create-menu input{
+    display: none;
+}
+.create-menu:hover{
+    background: #ADD8E6;
+}
+/*create-menu*/

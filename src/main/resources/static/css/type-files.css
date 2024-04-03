@@ -1,0 +1,36 @@
+/*files-type filter*/
+.files-type {
+    margin-top: 2vw;
+    margin-left: 20vw;
+    display: block;
+    overflow: hidden;
+}
+.files-type-item {
+    float: left;
+    display: inline-block;
+}
+.files-type-item input[type=radio] {
+    display: none;
+}
+.files-type-item label {
+    display: inline-block;
+    padding: 0px 15px;
+    line-height: 34px;
+    border: 1px solid #999;
+    border-right: none;
+    cursor: pointer;
+    user-select: none;
+}
+
+.files-type .item-1 label {
+    border-radius: 6px 0 0 6px;
+}
+.files-type .item-2 label {
+    border-radius: 0 6px 6px 0;
+    border-right: 1px solid #999;
+}
+
+.files-type input[type=radio]:checked + label {
+    background: #ADD8E6;
+}
+/*files-type filter*/
