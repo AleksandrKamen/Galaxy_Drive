@@ -1,4 +1,4 @@
-package com.galaxy.galaxy_drive.model.entity;
+package com.galaxy.galaxy_drive.model.entity.user;
 
 import org.springframework.security.core.GrantedAuthority;
 

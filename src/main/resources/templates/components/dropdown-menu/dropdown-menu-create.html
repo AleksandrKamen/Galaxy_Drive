@@ -1,0 +1,38 @@
+<body>
+<div class="create-menu dropdown border border-1 rounded-pill">
+    <a class="btn btn-lg" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <span class="d-none d-lg-inline">
+                <i class="fa-solid fa-plus me-3"></i><span th:text="#{home.page.create.btn}"></span>
+            </span>
+        <span class="d-inline d-lg-none">
+                <i class="fa-solid fa-plus"></i>
+            </span>
+    </a>
+
+    <ul class="dropdown-menu">
+        <li>
+            <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#createFolderModal">
+                <i class="fa-solid fa-folder-plus me-2"></i> <span th:text="#{create.folder}"></span>
+            </button>
+        </li>
+        <li>
+            <form th:action="@{/upload}" method="post" enctype="multipart/form-data" id="upload-form-file">
+                <label class="dropdown-item" for="upload-file">
+                    <i class="fa-solid fa-file-arrow-up me-2"></i> <span th:text="#{upload.file}"></span>
+                </label>
+                <input type="file" id="upload-file" name="files" multiple onchange="checkFileSize(this)">
+            </form>
+        </li>
+        <li>
+            <form th:action="@{/upload}" method="post" enctype="multipart/form-data" id="upload-form-folder">
+                <label class="dropdown-item" for="upload-folder">
+                    <i class="fa-solid fa-folder-open me-2"></i><span th:text="#{upload.folder}"></span>
+                </label>
+                <input type="file" id="upload-folder" name="files" webkitdirectory onchange="this.form.submit()">
+            </form>
+        </li>
+    </ul>
+</div>
+
+<span id="messageMaxSize" class="d-none" th:text="#{maxSize.message}"></span>
+</body>

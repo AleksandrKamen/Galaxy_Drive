@@ -1,0 +1,28 @@
+<body>
+<div th:fragment="popup-message" class="popup-message" id="popup-message">
+    <div class="popup-message-content">
+        <button type="button" class="btn-close" aria-label="Close" id="close-popup-message"></button>
+        <div class="popup-message-title" th:switch="${typeMessage}">
+            <span th:case="'upload'"><h6 th:text="#{upload.message} + ' ' + ${files.size()}"></h6></span>
+            <span th:case="'delete'"><h6 th:text="#{delete.message}"></h6></span>
+            <span th:case="'rename'"><h6 th:text="#{rename.message}"></h6></span>
+            <span th:case="'copy'"><h6 th:text="#{copy.message}"></h6></span>
+            <span th:case="'create'"><h6 th:text="#{create.message}"></h6></span>
+        </div>
+        <div class="popup-message-body" th:each="file:${files}">
+            <p><span th:text="${file}"></span> <i class="fa-solid fa-check"></i></p>
+        </div>
+    </div>
+</div>
+
+
+
+    <script>
+        var message = document.getElementById('popup-message');
+        var closeBtn = document.getElementById('close-popup-message');
+        closeBtn.addEventListener("click", function () {
+            message.style.display = 'none'
+        });
+    </script>
+
+</body>

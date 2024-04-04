@@ -1,0 +1,14 @@
+<body>
+<div class="container mt-auto">
+    <div class="popup" id="popup">
+        <div class="popup-content text-center">
+            <button type="button" class="btn-close" aria-label="Close" id="close-popup"></button>
+            <h6 th:text="#{popup.title}"></h6>
+            <p th:text="#{popup.message}"></p>
+            <div class="popup-buttons d-grid gap-2 d-md-block">
+                <button type="button" class="btn btn-primary" aria-label="Close" id="accept" th:text="#{popup.accept}"></button>
+            </div>
+        </div>
+    </div>
+</div>
+</body>

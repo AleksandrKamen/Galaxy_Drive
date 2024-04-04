@@ -1,0 +1,39 @@
+<body>
+<div class="dropdown" id="dropdown-menu-folder">
+    <button class="btn" type="button" id="dropdownMenu1" data-bs-toggle="dropdown"
+            aria-expanded="false">
+        <i class="fa-solid fa-ellipsis-vertical"></i>
+    </button>
+    <ul class="dropdown-menu">
+        <li>
+            <a class="dropdown-item" th:href="@{'/downloadFolder?folderName='+${folderPath}}">
+                <i class="fa-solid fa-download me-2"></i> <span th:text="#{download.btn}"></span>
+            </a>
+        </li>
+        <li>
+            <button id="rename-folder-btn" class="dropdown-item rename-btn" data-bs-toggle="modal"
+                    data-bs-target="#renameModal" th:data-object-name="${folderPath}" th:data-object-type="folder">
+                <i class="fa-solid fa-pencil me-2"></i> <span th:text="#{rename.modal.title}"></span>
+            </button>
+        </li>
+        <li>
+            <button id="copy-folder-btn" class="dropdown-item copy-btn" data-bs-toggle="modal"
+                    data-bs-target="#copyModal" th:data-object-name="${folderPath}" th:data-object-type="folder">
+                <i class="fa-solid fa-copy me-2"></i><span th:text="#{copy.modal.copy}"></span>
+            </button>
+        </li>
+        <li>
+            <hr class="dropdown-divider">
+        </li>
+        <li>
+            <form th:action="@{/delete}" method="post">
+                <input type="hidden" name="type" value="folder">
+                <input type="hidden" id="delete-folder" name="objectName" th:value="${folderPath}">
+                <button class="dropdown-item" type="submit">
+                    <i class="fa-solid fa-trash-can me-2"></i><span th:text="#{delete.btn}"></span>
+                </button>
+            </form>
+        </li>
+    </ul>
+</div>
+</body>

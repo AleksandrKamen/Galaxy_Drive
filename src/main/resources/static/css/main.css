@@ -1,3 +1,4 @@
+/*Main*/
 html {
     font-size: 16px;
 }
@@ -20,15 +21,15 @@ body {
     min-height: 70vh;
 }
 
-.main-content-empty {
-    flex: 1;
-    min-height: 70vh;
-}
-
 img {
     max-width: 100%;
     height: auto;
 }
+.bi{
+    font-size: 1.5rem;
+    margin-right: 0.5rem;
+}
+
 
 section {
     padding: 50px 0;
@@ -42,7 +43,7 @@ a:hover {
     color: #555;
 }
 
-/*Header*/
+/*Navbar*/
 .navbar-light .navbar-nav .nav-link {
     color: #111;
     font-weight: 500;
@@ -72,7 +73,7 @@ a:hover {
     color: inherit;
 }
 
-/*Header*/
+/*Navbar*/
 
 
 /*Footer*/
@@ -111,42 +112,30 @@ a:hover {
     margin-right: 15px;
     font-size: 20px;
 }
-
 /*Footer*/
-
-
-/*Popup message*/
-.popup-buttons {
-    display: flex;
-    justify-content: center;
-    margin-top: 20px;
-    font-size: 12px;
+/*error*/
+.error-message{
+    text-align: center;
 }
-
-.btn-close {
-    position: fixed;
-    top: 5px;
-    right: 10px;
+.error-message i{
+    color: FireBrick;
 }
-
-.popup {
-    font-size: 12px;
-    position: fixed;
-    top: 70%;
-    left: 85%;
-    transform: translate(-50%, -50%);
-    display: none;
-    z-index: 1000;
+.error-image{
+    max-width: 60%;
+    max-height: 40%;
 }
+/*error*/
 
-.popup-content {
-    position: relative;
-    padding: 20px;
-    background-color: #fff;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    max-width: 400px;
-    margin: 0 auto;
-}
+/*Main*/
 
-/*Popup message*/
+
+
+
+
+
+
+
+
+
+
 

@@ -4,7 +4,7 @@
     <title>Registration Form</title>
 </head>
 <body>
-<div th:insert="~{/components/navbar}"></div>
+<th:block th:insert="~{/components/navbar}"></th:block>
 
 <section class="main-content">
     <div class="container mt-3">
@@ -20,8 +20,8 @@
                         <label for="userName" class="form-label" th:text="#{user.name}"></label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
-                            <input type="text" class="form-control" id="userName" name="userName"
-                                   th:placeholder="#{placeholder.username}" minlength="3" maxlength="20" required>
+                            <input type="email" class="form-control" id="userName" name="userName"
+                                   th:placeholder="#{placeholder.username}" required>
                         </div>
                     </div>
                     <div class="mb-3">
@@ -53,20 +53,33 @@
             </div>
         </div>
     </div>
+
+    <div th:if="${errors}" class="error-message" th:each="error:${errors}">
+        <i class="bi bi-exclamation-triangle"></i>
+        <span th:text="${error}"></span>
+    </div>
+
 </section>
+
+<div id="passwordBtnText" class="d-none">
+    <span id="showBtnText" th:text="#{show.btn}"></span>
+    <span id="hideBtnText" th:text="#{password.hide}"></span>
+    <span id="loadingText" th:text="#{loading}"></span>
+</div>
 
 <!--footer-->
 <div th:insert="~{/components/footer}"></div>
 <!--footer-->
 
 <!--scripts-->
-<div th:insert="~{components/head :: #bootstrapScript}"></div>
-<div th:insert="~{components/head :: #toggle-password}"></div>
-<div th:insert="~{components/head :: #loading}"></div>
+<th:block th:insert="~{components/head :: #bootstrapScript}"></th:block>
+<script src="/js/toggle-password.js" ></script>
+<script src="/js/loading.js" ></script>
+<script src="/js/popup-cookies-message.js"></script>
 <!--scripts-->
 
 <!--popup-->
-<div th:insert="~{/components/popup}"></div>
+<th:block th:insert="~{/components/popup-message/popup-cookies-message}"></th:block>
 <!--popup-->
 
 </body>

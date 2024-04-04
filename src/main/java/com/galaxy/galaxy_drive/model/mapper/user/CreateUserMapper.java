@@ -1,9 +1,10 @@
-package com.galaxy.galaxy_drive.model.mapper;
+package com.galaxy.galaxy_drive.model.mapper.user;
 
-import com.galaxy.galaxy_drive.model.dto.UserCreateDto;
-import com.galaxy.galaxy_drive.model.entity.Role;
-import com.galaxy.galaxy_drive.model.entity.SignupMethod;
-import com.galaxy.galaxy_drive.model.entity.User;
+import com.galaxy.galaxy_drive.model.dto.user.UserCreateDto;
+import com.galaxy.galaxy_drive.model.entity.user.Role;
+import com.galaxy.galaxy_drive.model.entity.user.SignupMethod;
+import com.galaxy.galaxy_drive.model.entity.user.User;
+import com.galaxy.galaxy_drive.model.mapper.Mapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;

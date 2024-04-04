@@ -1,0 +1,13 @@
+<body>
+<form action="search" method="get" class="d-flex mx-auto w-50" role="search">
+    <div class="input-group">
+            <span class="input-group-text">
+                <button type="submit" class="btn btn-unstyled">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                </button>
+            </span>
+        <input class="form-control text-truncate me-2" type="search" name="query" id="query"
+               th:placeholder="#{home.page.search}" maxlength="20" aria-label="Search" th:value="${query}" required>
+    </div>
+</form>
+</body>

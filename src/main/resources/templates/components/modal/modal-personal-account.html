@@ -1,0 +1,39 @@
+<body>
+<div th:if="${user}" class="modal fade" id="modal-cart" tabindex="-1" aria-labelledby="modalLabel"
+     aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+
+            <div class="modal-header bg-secondary text-white">
+                <h1 class="modal-title fs-5" id="modalLabel" th:text="#{navbar.personal.account}"></h1>
+            </div>
+            <div class="modal-body">
+                <p>
+                    <span th:text="#{personal.account.user-email} + ' - ' +  ${user.userName}"></span>
+                </p>
+                <p>
+                    <span th:text="#{personal.account.user-name} + ' - '"></span>
+                    <span th:text="${user.firstName}" id="currnetName"></span>
+                    <a href="#" onclick="editField('currnetName')">
+                        <i class="fa-solid fa-pen"></i>
+                    </a>
+                </p>
+                <p>
+                    <span th:text="#{personal.account.user-lastname} + ' - '" ></span>
+                    <span th:text="${user.lastName}" id="lastName"></span>
+                    <a href="#" onclick="editField('lastName')"><i class="fa-solid fa-pen"></i></a>
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="close-btn" th:text="#{navbar.modal.close.btn}"></button>
+                <form th:action="@{update}" method="post" enctype="application/x-www-form-urlencoded">
+                    <input type="hidden" name="userNameInput" id="userNameInput" th:value="${user.userName}">
+                    <input type="hidden" name="currnetNameInput" id="currnetNameInput">
+                    <input type="hidden" name="lastNameInput" id="lastNameInput">
+                    <button type="submit" class="btn btn-primary" data-bs-dismiss="modal" id="save-btn" th:text="#{navbar.modal.save.btn}"></button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</body>

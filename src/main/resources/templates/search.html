@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:insert="~{components/head :: #head}">
+    <meta charset="UTF-8">
+    <title>Search</title>
+</head>
+<body>
+<!--navbar-->
+<th:block th:insert="~{/components/navbar}"></th:block>
+<!--navbar-->
+<section class="main-content">
+
+    <th:block th:insert="~{/components/search-form}"></th:block>
+
+    <h4 class="text-center mt-5" th:text="#{search.searching.results}"></h4>
+
+    <div class="table-container">
+        <table class="table table-hover">
+            <th:block th:insert="~{/components/column-names}"></th:block>
+            <tbody>
+            <tr class="folders" th:each="folder:${foundFolders}"
+                th:with="folderName=${folder.getName()},
+                         folderPath=${folder.getPath()},
+                         parentFolderPath=${folder.getParentFolderPath()}">
+                <th scope="row" class="text-start">
+                    <a th:href="'/?path=' + ${folderPath}">
+                        <i class="bi bi-folder" style="color: Grey;"></i>
+                        <span th:text="${folderName}"></span>
+                    </a>
+                </th>
+                <td>
+                    <a class="nav-link" href="#" data-toggle="tooltip" th:title="#{navbar.personal.account}"
+                       data-bs-toggle="modal" data-bs-target="#modal-cart">
+                        <span th:text="${user.getFirstName() != null and user.getFirstName() != ''}  ? ${user.getFirstName()} : #{user.default.name}"></span>
+                    </a>
+                </td>
+                <td>-</td>
+                <td>-</td>
+                <td>
+                    <a th:href="'/?path=' + ${parentFolderPath}">
+                        <span th:text="${parentFolderPath.equals(userFolderName)} ? #{user.folder} : ${parentFolderPath.substring(parentFolderPath.lastIndexOf('/')+1)}"></span>
+                    </a>
+                </td>
+                <td>
+                    <th:block th:insert="~{/components/dropdown-menu/dropdown-menu-folder}"></th:block>
+                </td>
+            </tr>
+            <tr class="files" th:each="file:${foundFiles}"
+                th:with="fileName=${file.getName()},
+                         parentFolderPath=${file.getParentFolderPath()},
+                         fileType=${file.getType()},
+                         fileSize=${file.getSize()},
+                         lastModified=${file.getLastModified()} ">
+                <th scope="row" class="text-start">
+                    <th:block th:insert="~{components/icon-type}"></th:block>
+                    <span th:text="${fileName}"></span>
+                </th>
+                <td>
+                    <a class="nav-link" href="#" data-toggle="tooltip" th:title="#{navbar.personal.account}"
+                       data-bs-toggle="modal" data-bs-target="#modal-cart">
+                        <span th:text="${user.getFirstName() != null and user.getFirstName() != ''}  ? ${user.getFirstName()} : #{user.default.name}"></span>
+                    </a>
+                </td>
+                <td th:text="${lastModified}"></td>
+                <td th:text="${fileSize}"></td>
+                <td>
+                    <a th:href="'/?path=' + ${parentFolderPath}">
+                        <span th:text="${parentFolderPath.equals(userFolderName)} ? #{user.folder} : ${parentFolderPath.substring(parentFolderPath.lastIndexOf('/')+1)} "></span>
+                    </a>
+                </td>
+                <td>
+                    <th:block th:insert="~{/components/dropdown-menu/dropdown-menu-file}"></th:block>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+
+    <!--Not found-->
+    <div class="result-Not-Found text-center" th:if="${foundFiles.isEmpty() && foundFolders.isEmpty()}">
+        <img src="/picture/search-not-found.png">
+        <h4 th:text="#{search.result.not.found}"></h4>
+        <span th:text="#{search.change.request}"></span>
+    </div>
+    <!--Not found-->
+</section>
+
+<!-- modal-->
+<div th:insert="~{/components/modal/modal-copy}"></div>
+<div th:insert="~{/components/modal/modal-rename}"></div>
+<th:block th:insert="~{/components/modal/modal-create-folder}"></th:block>
+<!-- modal-->
+
+<!--footer-->
+<div th:insert="~{/components/footer}"></div>
+<!--footer-->
+
+<!--popup-->
+<th:block th:insert="~{/components/popup-message/popup-cookies-message}"></th:block>
+<div th:if="${typeMessage}">
+    <th:block th:insert="~{/components/popup-message/popup-operation-message}"></th:block>
+</div>
+<!--popup-->
+
+
+<!--scripts-->
+<th:block th:insert="~{components/head :: #bootstrapScript}"></th:block>
+<script src="/js/rename-function.js"></script>
+<script src="/js/copy-function.js"></script>
+<script src="/js/popup-cookies-message.js"></script>
+<!--scripts-->
+
+</body>
+</html>
