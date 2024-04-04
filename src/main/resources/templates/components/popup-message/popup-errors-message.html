@@ -1,0 +1,20 @@
+<body>
+<div th:fragment="popup-message" class="popup-message" id="popup-message">
+    <div class="popup-message-content">
+        <button type="button" class="btn-close" aria-label="Close" id="close-popup-message"></button>
+        <div class="popup-message-title" th:text="#{popup.errors.message.title}"></div>
+        <div class="popup-message-body">
+            <p><span th:text="${errors}"></span></i></p>
+        </div>
+    </div>
+</div>
+
+    <script>
+        var message = document.getElementById('popup-message');
+        var closeBtn = document.getElementById('close-popup-message');
+        closeBtn.addEventListener("click", function () {
+            message.style.display = 'none'
+        });
+    </script>
+
+</body>

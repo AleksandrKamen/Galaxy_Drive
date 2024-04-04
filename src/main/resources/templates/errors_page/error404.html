@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:insert="~{components/head :: #head}">
+    <title>Error</title>
+</head>
+<body>
+<div class="error-container justify-content-center align-items-center d-flex flex-column vh-100">
+    <h1 th:text="#{error404.title}"></h1>
+    <p th:text="#{error404.message}"></p>
+    <p><span th:text="#{error500.try}"></span> <a class="home page link" th:href="@{/}" th:text="#{error500.return}"></a></p>
+</div>
+
+<div th:insert="~{components/head :: #bootstrapScript}"></div>
+</body>
+</html>

@@ -1,4 +1,4 @@
-package com.galaxy.galaxy_drive.model.dto;
+package com.galaxy.galaxy_drive.model.dto.user;
 
 import lombok.Value;
 

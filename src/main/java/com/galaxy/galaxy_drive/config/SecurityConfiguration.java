@@ -1,6 +1,6 @@
 package com.galaxy.galaxy_drive.config;
 
-import com.galaxy.galaxy_drive.service.UserService;
+import com.galaxy.galaxy_drive.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
