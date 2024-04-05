@@ -26,9 +26,10 @@ public class RegistrationController {
     public String registrationPage() {
         return "registration";
     }
-
     @PostMapping
-    public String create(@Validated UserCreateDto user, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
+    public String create(@Validated UserCreateDto user,
+                         BindingResult bindingResult,
+                         RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()) {
             redirectAttributes.addFlashAttribute("errors", bindingResult.getAllErrors()
                     .stream()

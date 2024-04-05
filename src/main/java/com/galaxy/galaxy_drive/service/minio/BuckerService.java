@@ -7,6 +7,7 @@ import io.minio.MinioClient;
 import io.minio.errors.*;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 
@@ -18,10 +19,11 @@ import java.security.NoSuchAlgorithmException;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class BuckerService {
-     MinioClient minioClient;
-     MinioProperties minioProperties;
+    MinioClient minioClient;
+    MinioProperties minioProperties;
 
-    private void createBucketIfNotExist() throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+    @SneakyThrows
+    private void createBucketIfNotExist() {
         boolean found = isBucketExist();
         if (!found) {
             minioClient.makeBucket(MakeBucketArgs.builder()
@@ -30,7 +32,8 @@ public class BuckerService {
         }
     }
 
-    private Boolean isBucketExist() throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+    @SneakyThrows
+    private Boolean isBucketExist() {
         return minioClient.bucketExists(BucketExistsArgs.builder()
                 .bucket(minioProperties.getBucket())
                 .build());

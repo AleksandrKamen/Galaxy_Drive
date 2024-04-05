@@ -7,6 +7,8 @@ import com.galaxy.galaxy_drive.util.FolderUtil;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -35,6 +37,8 @@ import java.util.stream.Collectors;
 public class MainController {
      UserService userService;
      MinioService minioService;
+     MessageSource messageSource;
+
     @GetMapping
     public String homePage(@RequestParam(required = false) String path,
                            @AuthenticationPrincipal Object principal,
@@ -55,8 +59,9 @@ public class MainController {
         }
 
         if (!path.startsWith(userFolderPath) || !minioService.isFolderExist(path)){
-            throw new FolderNotFoundException("Папка не найдена");
+            throw new FolderNotFoundException(messageSource.getMessage("error.message.folder", null, LocaleContextHolder.getLocale()));
         }
+
            model.addAllAttributes(Map.of(
                 "user", user,
                 "allFoldersInFolder", minioService.getAllFoldersInFolder(path),
@@ -109,6 +114,9 @@ public class MainController {
                              @RequestHeader(value = "Referer") String referer){
         minioService.delete(objectName,type);
         addRedirectAttributes(redirectAttributes, "delete", List.of(objectName));
+        if (!minioService.isFolderExist(referer.substring(referer.indexOf("=") + 1))){
+            return "redirect:" + FolderUtil.getParentFolder(referer);
+        }
         return "redirect:" + referer;
     }
     @PostMapping("rename")
@@ -136,7 +144,6 @@ public class MainController {
 
     @GetMapping("downloadFile")
     public ResponseEntity<InputStreamResource> downloadFile(@RequestParam("fileName") String fileName) {
-        try {
             var stream = minioService.downloadFile(fileName);
             var headers = new HttpHeaders();
             headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + URLEncoder.encode(fileName, StandardCharsets.UTF_8));
@@ -144,13 +151,9 @@ public class MainController {
                     .headers(headers)
                     .contentType(MediaType.APPLICATION_OCTET_STREAM)
                     .body(new InputStreamResource(stream));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-        }
     }
     @GetMapping("downloadFolder")
     public ResponseEntity<byte[]> downloadFolder(@RequestParam("folderName") String folderName) {
-        try {
             var zipData = minioService.downloadFolder(folderName);
             var headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
@@ -159,17 +162,9 @@ public class MainController {
                     .ok()
                     .headers(headers)
                     .body(zipData.toByteArray());
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(null);
-        }
     }
     private void addRedirectAttributes(RedirectAttributes redirectAttributes, String typeMessage, List<String> files){
         redirectAttributes.addFlashAttribute("typeMessage",typeMessage);
         redirectAttributes.addFlashAttribute("files",files);
     }
-
-
 }

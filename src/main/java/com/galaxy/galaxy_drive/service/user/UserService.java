@@ -1,5 +1,6 @@
 package com.galaxy.galaxy_drive.service.user;
 
+import com.galaxy.galaxy_drive.exception.minio.MinioCreateException;
 import com.galaxy.galaxy_drive.exception.user.UserAlreadyExistsException;
 import com.galaxy.galaxy_drive.exception.user.UserNotFoundException;
 import com.galaxy.galaxy_drive.model.dto.user.UserCreateDto;
@@ -26,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -60,26 +62,28 @@ public class UserService implements UserDetailsService {
         var newUser = createUserMapper.map(userCreateDto);
         try {
             var user = userRepository.save(newUser);
+            minioService.createUserFolder(user.getId());
             return readUserMapper.map(user);
-        } catch (Exception e) {
+        } catch (MinioCreateException minioCreateException) {
+                throw minioCreateException;
+        } catch (Exception e){
             throw new UserAlreadyExistsException(messageSource.getMessage(
                     "error.message.userExist",
                     new String[]{newUser.getUserName()},
-                    LocaleContextHolder.getLocale())
-            );
+                    LocaleContextHolder.getLocale()));
         }
     }
 
     @Transactional
-    public void createUserIfNotExist(OidcUserRequest userRequest) {
-        var email = userRequest.getIdToken().getEmail();
-        createUserAndFolderIfNotExist(email, SignupMethod.GOOGLE);
+    public Optional<User> createUserIfNotExist(OidcUserRequest userRequest) throws MinioCreateException{
+       var email = userRequest.getIdToken().getEmail();
+       return createUserAndFolderIfNotExist(email, SignupMethod.GOOGLE);
     }
 
     @Transactional
-    public void createUserIfNotExist(OAuth2User oAuth2User) {
-        var login = oAuth2User.getAttribute("login").toString();
-        createUserAndFolderIfNotExist(login, SignupMethod.GITGUB);
+    public Optional<User> createUserIfNotExist(OAuth2User oAuth2User) throws MinioCreateException {
+       var login = oAuth2User.getAttribute("login").toString();
+       return createUserAndFolderIfNotExist(login, SignupMethod.GITGUB);
     }
 
     @Override
@@ -94,16 +98,22 @@ public class UserService implements UserDetailsService {
     }
 
     @Transactional
-    public void createUserAndFolderIfNotExist(String userName, SignupMethod signupMethod) {
+    public Optional<User>  createUserAndFolderIfNotExist(String userName, SignupMethod signupMethod)  {
         if (!userRepository.existsByUserName(userName)) {
-            var save = userRepository.save(User.builder()
-                    .userName(userName)
-                    .password(passwordEncoder.encode(UUID.randomUUID().toString()))
-                    .role(Role.USER)
-                    .signupMethod(signupMethod)
-                    .build());
-            minioService.createUserFolder(save.getId());
+            try {
+                var save = userRepository.save(User.builder()
+                        .userName(userName)
+                        .password(passwordEncoder.encode(UUID.randomUUID().toString()))
+                        .role(Role.USER)
+                        .signupMethod(signupMethod)
+                        .build());
+                minioService.createUserFolder(save.getId());
+                return Optional.of(save);
+            } catch (MinioCreateException minioCreateException) {
+                throw minioCreateException;
+            }
         }
+        return Optional.empty();
     }
 
     private String getUserNotFoundMessage(String userName) {
