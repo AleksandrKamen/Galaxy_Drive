@@ -28,10 +28,10 @@ public class SearchController {
     public String searchPage(@RequestParam String query,
                              @AuthenticationPrincipal Object principal,
                              Model model){
-        String userName = null;
+        String userName;
         if (principal instanceof UserDetails){
             userName =  ((UserDetails) principal).getUsername();
-        } else if(principal instanceof OAuth2User) {
+        } else {
             var email = ((OAuth2User) principal).getAttribute("email");
             var login = ((OAuth2User) principal).getAttribute("login");
             userName = email != null ? email.toString() : login != null ? login.toString() : null;

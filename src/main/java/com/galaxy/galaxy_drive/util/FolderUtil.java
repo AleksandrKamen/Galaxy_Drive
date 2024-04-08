@@ -13,31 +13,28 @@ public class FolderUtil {
         return "user-" + id + "-files";
     }
 
-    public List<String> getParentFolders(String path) {
-        var parentFolders = new ArrayList<String>();
-        parentFolders.add(path);
-        while (path.contains("/")) {
-            var parentFolderPath = path.substring(0, path.lastIndexOf("/"));
-            parentFolders.add(0, parentFolderPath);
-            path = parentFolderPath;
+    public List<String> getBreadcrumbs(String folderPath) {
+        var breadcrumbs = new ArrayList<String>();
+        breadcrumbs.add(folderPath);
+        while (folderPath.contains("/")) {
+            var parentFolderPath = FolderUtil.getParentFolderPath(folderPath);
+            breadcrumbs.add(0, parentFolderPath);
+            folderPath = parentFolderPath;
         }
-        return parentFolders.stream()
-                .skip(parentFolders.size() > PARENT_FOLDERS_COUNT ? parentFolders.size() - PARENT_FOLDERS_COUNT : 0)
+        return breadcrumbs.stream()
+                .skip(breadcrumbs.size() > PARENT_FOLDERS_COUNT ? breadcrumbs.size() - PARENT_FOLDERS_COUNT : 0)
                 .toList();
     }
-    public String getParentFolder(String path){
+    public String getParentFolderPath(String path){
         return path.substring(0, path.lastIndexOf("/"));
     }
 
-    public String getShortNameFolder(String folderName){
-        var lastIndexOf = folderName.lastIndexOf("/");
-        return  UriEncoder.encode(folderName.substring(lastIndexOf + 1));
+    public String getNameFolder(String folderName){
+        return  UriEncoder.encode(folderName.substring(folderName.lastIndexOf("/") + 1));
     }
 
     public String getNewPathFolder(String currentName, String newName){
-        var lastIndexOf = currentName.lastIndexOf("/");
-        var folderDir = currentName.substring(0, lastIndexOf +1);
-        return folderDir + newName;
+        return getParentFolderPath(currentName) + "/" + newName;
     }
 
 

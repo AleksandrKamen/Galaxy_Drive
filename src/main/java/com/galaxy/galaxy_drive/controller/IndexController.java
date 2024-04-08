@@ -11,7 +11,6 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -34,7 +33,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class MainController {
+public class IndexController {
      UserService userService;
      MinioService minioService;
      MessageSource messageSource;
@@ -66,7 +65,7 @@ public class MainController {
                 "user", user,
                 "allFoldersInFolder", minioService.getAllFoldersInFolder(path),
                 "allFilesInFolder", minioService.getAllFilesInFolder(path),
-                "parentFolders", FolderUtil.getParentFolders(path),
+                "parentFolders", FolderUtil.getBreadcrumbs(path),
                 "userFolderName", userFolderPath,
                 "path",path
         ));
@@ -115,7 +114,7 @@ public class MainController {
         minioService.delete(objectName,type);
         addRedirectAttributes(redirectAttributes, "delete", List.of(objectName));
         if (!minioService.isFolderExist(referer.substring(referer.indexOf("=") + 1))){
-            return "redirect:" + FolderUtil.getParentFolder(referer);
+            return "redirect:" + FolderUtil.getParentFolderPath(referer);
         }
         return "redirect:" + referer;
     }
@@ -157,7 +156,7 @@ public class MainController {
             var zipData = minioService.downloadFolder(folderName);
             var headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-            headers.setContentDispositionFormData("attachment", FolderUtil.getShortNameFolder(folderName) + ".zip");
+            headers.setContentDispositionFormData("attachment", FolderUtil.getNameFolder(folderName) + ".zip");
             return ResponseEntity
                     .ok()
                     .headers(headers)
