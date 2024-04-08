@@ -19,7 +19,6 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -75,19 +74,19 @@ public class UserService implements UserDetailsService {
     }
 
     @Transactional
-    public Optional<User> createUserIfNotExist(OidcUserRequest userRequest) throws MinioCreateException{
+    public Optional<User> createUserIfNotExist(OidcUserRequest userRequest) {
        var email = userRequest.getIdToken().getEmail();
        return createUserAndFolderIfNotExist(email, SignupMethod.GOOGLE);
     }
 
     @Transactional
-    public Optional<User> createUserIfNotExist(OAuth2User oAuth2User) throws MinioCreateException {
+    public Optional<User> createUserIfNotExist(OAuth2User oAuth2User)  {
        var login = oAuth2User.getAttribute("login").toString();
        return createUserAndFolderIfNotExist(login, SignupMethod.GITGUB);
     }
 
     @Override
-    public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String userName) {
         return userRepository.findByUserName(userName)
                 .map(user -> new org.springframework.security.core.userdetails.User(
                         user.getUserName(),

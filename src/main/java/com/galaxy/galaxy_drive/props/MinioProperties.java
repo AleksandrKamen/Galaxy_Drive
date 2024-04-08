@@ -12,6 +12,4 @@ public class MinioProperties {
     private String url;
     private String accessKey;
     private String secretKey;
-
-
 }
