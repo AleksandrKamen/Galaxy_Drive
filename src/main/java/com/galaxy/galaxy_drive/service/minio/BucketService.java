@@ -4,6 +4,7 @@ import com.galaxy.galaxy_drive.props.MinioProperties;
 import io.minio.BucketExistsArgs;
 import io.minio.MakeBucketArgs;
 import io.minio.MinioClient;
+import jakarta.annotation.PostConstruct;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -15,12 +16,15 @@ import org.springframework.stereotype.Service;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class BucketService {
     MinioClient minioClient;
+    MinioProperties minioProperties;
+
     @SneakyThrows
-    public void createBucketIfNotExist(String bucketName) {
-        boolean found = isBucketExist(bucketName);
+    @PostConstruct
+    public void createBucketIfNotExist() {
+        boolean found = isBucketExist(minioProperties.getBucket());
         if (!found) {
             minioClient.makeBucket(MakeBucketArgs.builder()
-                    .bucket(bucketName)
+                    .bucket(minioProperties.getBucket())
                     .build());
         }
     }

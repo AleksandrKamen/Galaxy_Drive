@@ -1,6 +1,6 @@
 package com.galaxy.galaxy_drive.controller;
 
-import com.galaxy.galaxy_drive.exception.FolderNotFoundException;
+import com.galaxy.galaxy_drive.exception.minio.FolderNotFoundException;
 import com.galaxy.galaxy_drive.exception.minio.*;
 import com.galaxy.galaxy_drive.exception.user.UserAlreadyExistsException;
 import com.galaxy.galaxy_drive.exception.user.UserNotFoundException;

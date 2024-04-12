@@ -1,9 +1,6 @@
 spring:
-  config:
-    import: optional:file:.env[.properties]
-
   datasource:
-    url: jdbc:postgresql://${HOST}:5434/${POSTGRES_DATABASE}
+    url: jdbc:postgresql://postgres_db:5432/${POSTGRES_DATABASE}
     username: ${POSTGRES_USER}
     password: ${POSTGRES_PASSWORD}
     driver-class-name: org.postgresql.Driver
@@ -15,7 +12,6 @@ spring:
   session:
     store-type: redis
     timeout: 1800
-
   security:
     oauth2:
       client:
@@ -24,7 +20,6 @@ spring:
             client-id: ${GOOGLE_CLIENT_ID}
             client-secret: ${GOOGLE_CLIENT_SECRET}
             redirect-uri: ${GOOGLE_REDIRECT_URI}
-
           github:
             client-id: ${GIT_HUB_CLIENT_ID}
             client-secret: ${GIT_HUB_CLIENT_SECRET}
@@ -36,12 +31,15 @@ spring:
     multipart:
       max-request-size: 100MB
       max-file-size: 100MB
-
+  data:
+    redis:
+      host: redis
 minio:
+  url: http://minio:${MINIO_PORT}
   bucket: ${MINIO_BUCKET}
-  url: ${MINIO_URL}
-  accessKey: ${MINIO_ACCESS_KEY}
-  secretKey: ${MINIO_SECRET_KEY}
+  accessKey: ${MINIO_ROOT_USER}
+  secretKey: ${MINIO_ROOT_PASSWORD}
+
 
 
 
