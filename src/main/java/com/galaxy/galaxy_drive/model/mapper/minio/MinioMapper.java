@@ -7,6 +7,8 @@ import com.galaxy.galaxy_drive.util.FolderUtil;
 import io.minio.messages.Item;
 import org.mapstruct.Mapper;
 
+import java.time.format.DateTimeFormatter;
+
 @Mapper(componentModel = "spring")
 public abstract class MinioMapper {
 
@@ -15,18 +17,16 @@ public abstract class MinioMapper {
                 FileUtil.getFileNameWithType(object.objectName()),
                 object.objectName(),
                 FileUtil.getSize(object.size()),
-                object.lastModified().toLocalDate(),
+                object.lastModified().format(DateTimeFormatter.ofPattern("dd-MM-yyy")),
                 FolderUtil.getParentFolderPath(object.objectName()),
                 FileUtil.getFileType(object.objectName()));
     }
 
-    public MinioFolderDto itemToMinioFolderDto(String folderPath){
+    public MinioFolderDto stringToMinioFolderDto(String folderPath){
         return new MinioFolderDto(
                 FolderUtil.getNameFolder(folderPath),
                 folderPath.substring(0, folderPath.length()-1),
                 FolderUtil.getParentFolderPath(folderPath)
         );
-
     }
-
 }

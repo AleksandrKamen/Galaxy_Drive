@@ -3,6 +3,8 @@ package com.galaxy.galaxy_drive.controller;
 import com.galaxy.galaxy_drive.exception.minio.FolderNotFoundException;
 import com.galaxy.galaxy_drive.service.minio.MinioService;
 import com.galaxy.galaxy_drive.service.user.UserService;
+import com.galaxy.galaxy_drive.util.AuthenticationUtil;
+import com.galaxy.galaxy_drive.util.FileUtil;
 import com.galaxy.galaxy_drive.util.FolderUtil;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -14,8 +16,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -36,21 +36,12 @@ import java.util.stream.Collectors;
 public class IndexController {
      UserService userService;
      MinioService minioService;
-     MessageSource messageSource;
 
     @GetMapping
     public String homePage(@RequestParam(required = false) String path,
                            @AuthenticationPrincipal Object principal,
                            Model model) {
-        String userName= null;
-        if (principal instanceof UserDetails){
-            userName =  ((UserDetails) principal).getUsername();
-        } else if (principal instanceof OAuth2User){
-            var email = ((OAuth2User) principal).getAttribute("email");
-            var login = ((OAuth2User) principal).getAttribute("login");
-            userName = email != null ? email.toString() : login != null ? login.toString() : null;
-        }
-        var user = userService.findByUserName(userName);
+        var user = userService.findByUserName(AuthenticationUtil.getUserName(principal));
         var userFolderPath = FolderUtil.getUserFolderName(user.getId());
 
         if (path == null || path.isEmpty()) {
@@ -58,7 +49,7 @@ public class IndexController {
         }
 
         if (!path.startsWith(userFolderPath) || !minioService.isFolderExist(path)){
-            throw new FolderNotFoundException(messageSource.getMessage("error.message.folder", null, LocaleContextHolder.getLocale()));
+            throw new FolderNotFoundException("Folder not found or not exist");
         }
 
            model.addAllAttributes(Map.of(
@@ -84,24 +75,21 @@ public class IndexController {
                              List<MultipartFile> files,
                              RedirectAttributes redirectAttributes,
                              @RequestHeader(value = "Referer") String referer) {
-        var path = referer.substring(referer.indexOf("=") + 1);
-        var addFiles = files.stream()
+        var uploadFiles = files.stream()
                             .map(file -> {
-                                minioService.uploadFile(file, UriEncoder.decode(path) + "/" + file.getOriginalFilename());
+                                minioService.uploadFile(file, UriEncoder.decode(getPath(referer)) + "/" + file.getOriginalFilename());
                                 return file.getOriginalFilename();
                             })
                             .collect(Collectors.toList());
-        addRedirectAttributes(redirectAttributes, "upload", addFiles);
-        return "redirect:/?path="+path;
+        addRedirectAttributes(redirectAttributes, "upload", uploadFiles);
+        return "redirect:" + referer;
     }
 
     @PostMapping("create")
     public String createFolder(String folderName,
                                RedirectAttributes redirectAttributes,
                                @RequestHeader(value = "Referer") String referer)  {
-        var indexOf = referer.indexOf("=") + 1;
-        var path = referer.substring(indexOf);
-        minioService.createEmptyFolderWithName(path, folderName);
+        minioService.createEmptyFolderWithName(getPath(referer), folderName);
         addRedirectAttributes(redirectAttributes,"create", List.of(folderName));
         return "redirect:" + referer;
     }
@@ -112,8 +100,8 @@ public class IndexController {
                              RedirectAttributes redirectAttributes,
                              @RequestHeader(value = "Referer") String referer){
         minioService.delete(objectName,type);
-        addRedirectAttributes(redirectAttributes, "delete", List.of(objectName));
-        if (!minioService.isFolderExist(referer.substring(referer.indexOf("=") + 1))){
+        addRedirectAttributes(redirectAttributes, "delete", List.of(getName(objectName,type)));
+        if (!minioService.isFolderExist(getPath(referer))){
             return "redirect:" + FolderUtil.getParentFolderPath(referer);
         }
         return "redirect:" + referer;
@@ -125,7 +113,7 @@ public class IndexController {
                              RedirectAttributes redirectAttributes,
                              @RequestHeader(value = "Referer") String referer) {
         minioService.rename(currentName,newName,type);
-        addRedirectAttributes(redirectAttributes, "rename", List.of(currentName));
+        addRedirectAttributes(redirectAttributes, "rename", List.of(getName(currentName, type)));
         return "redirect:" + referer;
     }
 
@@ -136,7 +124,7 @@ public class IndexController {
                            RedirectAttributes redirectAttributes,
                            @RequestHeader(value = "Referer") String referer)  {
         minioService.copy(currentName, copyName, type);
-        addRedirectAttributes(redirectAttributes, "copy", List.of(currentName));
+        addRedirectAttributes(redirectAttributes, "copy", List.of(getName(currentName, type)));
         return "redirect:" + referer;
     }
 
@@ -166,4 +154,12 @@ public class IndexController {
         redirectAttributes.addFlashAttribute("typeMessage",typeMessage);
         redirectAttributes.addFlashAttribute("files",files);
     }
+    private String getName(String path, String type){
+        return type.equals("folder") ? FolderUtil.getNameFolder(path) : FileUtil.getFileNameWithType(path);
+    }
+    private String getPath(String referer){
+        return referer.substring(referer.indexOf("=") + 1);
+    }
+
+
 }

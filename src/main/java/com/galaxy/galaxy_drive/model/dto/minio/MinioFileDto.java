@@ -9,7 +9,7 @@ public class MinioFileDto {
     String name;
     String path;
     String size;
-    LocalDate lastModified;
+    String lastModified;
     String parentFolderPath;
     String type;
 }

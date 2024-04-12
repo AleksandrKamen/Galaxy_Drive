@@ -107,7 +107,7 @@ public class MinioService {
         return getAllObjectInFolder(folderName, false)
                 .stream()
                 .filter(item -> item.isDir())
-                .map(item -> minioMapper.itemToMinioFolderDto(item.objectName()))
+                .map(item -> minioMapper.stringToMinioFolderDto(item.objectName()))
                 .toList();
     }
 
@@ -171,7 +171,7 @@ public class MinioService {
 
     public List<MinioFolderDto> searchFolderByName(String parentFolderName, String folderName) {
         return getAllUsersFolders(parentFolderName).stream()
-                .map(minioMapper::itemToMinioFolderDto)
+                .map(minioMapper::stringToMinioFolderDto)
                 .filter(folder -> folder.getName().startsWith(folderName))
                 .collect(Collectors.toList());
     }
