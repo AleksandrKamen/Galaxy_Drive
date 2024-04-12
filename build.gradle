@@ -26,11 +26,11 @@ dependencies {
     implementation 'org.liquibase:liquibase-core'
     implementation"io.minio:minio:${versions.minio}"
     implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
-    implementation "org.mapstruct:mapstruct:${versions.mapstruct}"
     implementation 'org.springframework.security:spring-security-oauth2-client'
     implementation 'org.springframework.security:spring-security-oauth2-jose'
+    implementation "org.mapstruct:mapstruct:${versions.mapstruct}"
 
-    annotationProcessor "org.mapstruct:mapstruct:${versions.mapstruct}"
+    annotationProcessor "org.mapstruct:mapstruct-processor:${versions.mapstruct}"
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'

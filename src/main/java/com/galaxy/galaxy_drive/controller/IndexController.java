@@ -1,6 +1,6 @@
 package com.galaxy.galaxy_drive.controller;
 
-import com.galaxy.galaxy_drive.exception.FolderNotFoundException;
+import com.galaxy.galaxy_drive.exception.minio.FolderNotFoundException;
 import com.galaxy.galaxy_drive.service.minio.MinioService;
 import com.galaxy.galaxy_drive.service.user.UserService;
 import com.galaxy.galaxy_drive.util.FolderUtil;

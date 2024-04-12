@@ -8,8 +8,7 @@ import com.galaxy.galaxy_drive.model.dto.user.UserReadDto;
 import com.galaxy.galaxy_drive.model.entity.user.Role;
 import com.galaxy.galaxy_drive.model.entity.user.SignupMethod;
 import com.galaxy.galaxy_drive.model.entity.user.User;
-import com.galaxy.galaxy_drive.model.mapper.user.CreateUserMapper;
-import com.galaxy.galaxy_drive.model.mapper.user.ReadUserMapper;
+import com.galaxy.galaxy_drive.model.mapper.user.UserMapper;
 import com.galaxy.galaxy_drive.model.repository.UserRepository;
 import com.galaxy.galaxy_drive.service.minio.MinioService;
 import lombok.AccessLevel;
@@ -35,15 +34,14 @@ import java.util.UUID;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UserService implements UserDetailsService {
     UserRepository userRepository;
-    ReadUserMapper readUserMapper;
-    CreateUserMapper createUserMapper;
+    UserMapper userMapper;
     PasswordEncoder passwordEncoder;
     MinioService minioService;
     MessageSource messageSource;
 
     public UserReadDto findByUserName(String userName) {
         return userRepository.findByUserName(userName)
-                .map(readUserMapper::map)
+                .map(userMapper::userToUserReadDto)
                 .orElseThrow(() -> new UserNotFoundException(getUserNotFoundMessage(userName)));
     }
 
@@ -58,11 +56,11 @@ public class UserService implements UserDetailsService {
 
     @Transactional
     public UserReadDto create(UserCreateDto userCreateDto) {
-        var newUser = createUserMapper.map(userCreateDto);
+        var newUser = userMapper.userCreateDtoToUser(userCreateDto);
         try {
             var user = userRepository.save(newUser);
             minioService.createUserFolder(user.getId());
-            return readUserMapper.map(user);
+            return userMapper.userToUserReadDto(user);
         } catch (MinioCreateException minioCreateException) {
                 throw minioCreateException;
         } catch (Exception e){

@@ -3,8 +3,7 @@ package com.galaxy.galaxy_drive.service.minio;
 import com.galaxy.galaxy_drive.exception.minio.*;
 import com.galaxy.galaxy_drive.model.dto.minio.MinioFileDto;
 import com.galaxy.galaxy_drive.model.dto.minio.MinioFolderDto;
-import com.galaxy.galaxy_drive.model.mapper.minio.MinioFileMapper;
-import com.galaxy.galaxy_drive.model.mapper.minio.MinioFolderMapper;
+import com.galaxy.galaxy_drive.model.mapper.minio.MinioMapper;
 import com.galaxy.galaxy_drive.props.MinioProperties;
 import com.galaxy.galaxy_drive.util.FileUtil;
 import com.galaxy.galaxy_drive.util.FolderUtil;
@@ -33,8 +32,7 @@ import java.util.zip.ZipOutputStream;
 public class MinioService {
     MinioClient minioClient;
     MinioProperties minioProperties;
-    MinioFileMapper minioFileMapper;
-    MinioFolderMapper minioFolderMapper;
+    MinioMapper minioMapper;
     MessageSource messageSource;
 
     public void delete(String fileName, String type) {
@@ -67,7 +65,7 @@ public class MinioService {
                 .stream()
                 .filter(item -> !item.isDir())
                 .filter(item -> !item.objectName().equals(folderName + "/"))
-                .map(minioFileMapper::map)
+                .map(minioMapper::itemToMinioFileDto)
                 .toList();
     }
 
@@ -98,7 +96,7 @@ public class MinioService {
     public List<MinioFileDto> searchFileByName(String folderName, String fileName) {
         return getAllObjectInFolder(folderName, true).stream()
                 .filter(item -> !item.objectName().endsWith("/"))
-                .map(minioFileMapper::map)
+                .map(minioMapper::itemToMinioFileDto)
                 .filter(file -> file.getName().startsWith(fileName))
                 .collect(Collectors.toList());
     }
@@ -109,7 +107,7 @@ public class MinioService {
         return getAllObjectInFolder(folderName, false)
                 .stream()
                 .filter(item -> item.isDir())
-                .map(item -> minioFolderMapper.map(item.objectName()))
+                .map(item -> minioMapper.itemToMinioFolderDto(item.objectName()))
                 .toList();
     }
 
@@ -173,7 +171,7 @@ public class MinioService {
 
     public List<MinioFolderDto> searchFolderByName(String parentFolderName, String folderName) {
         return getAllUsersFolders(parentFolderName).stream()
-                .map(minioFolderMapper::map)
+                .map(minioMapper::itemToMinioFolderDto)
                 .filter(folder -> folder.getName().startsWith(folderName))
                 .collect(Collectors.toList());
     }
