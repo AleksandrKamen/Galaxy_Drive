@@ -6,20 +6,20 @@
     <title>Home page</title>
 </head>
 <body>
-<div th:insert="~{/components/navbar}"></div>
+<div th:insert="~{components/navbar}"></div>
 <section class="main-content">
 
 
-    <th:block th:insert="~{/components/dropdown-menu/dropdown-menu-create}"></th:block>
+    <th:block th:insert="~{components/dropdown-menu/dropdown-menu-create}"></th:block>
 
     <h4 class="text-center" th:text="#{home.page.greetings}"></h4>
-    <th:block th:insert="~{/components/search-form}"></th:block>
-    <th:block th:insert="~{/components/breadcrumbs}"></th:block>
-    <th:block th:insert="~{/components/files-type}"></th:block>
+    <th:block th:insert="~{components/search-form}"></th:block>
+    <th:block th:insert="~{components/breadcrumbs}"></th:block>
+    <th:block th:insert="~{components/files-type}"></th:block>
 
     <div class="table-container">
         <table class="table table-hover">
-            <th:block th:insert="~{/components/column-names}"></th:block>
+            <th:block th:insert="~{components/column-names}"></th:block>
             <tbody>
             <tr class="folders" th:each="folder:${allFoldersInFolder}"
                 th:with="folderName=${folder.getName()},
@@ -45,7 +45,7 @@
                     </a>
                 </td>
                 <td>
-                    <th:block th:insert="~{/components/dropdown-menu/dropdown-menu-folder}"></th:block>
+                    <th:block th:insert="~{components/dropdown-menu/dropdown-menu-folder}"></th:block>
                 </td>
             </tr>
             <tr class="files" th:each="file:${allFilesInFolder}"
@@ -72,7 +72,7 @@
                     </a>
                 </td>
                 <td>
-                    <th:block th:insert="~{/components/dropdown-menu/dropdown-menu-file}"></th:block>
+                    <th:block th:insert="~{components/dropdown-menu/dropdown-menu-file}"></th:block>
                 </td>
             </tr>
             </tbody>
@@ -81,23 +81,23 @@
 </section>
 
 <!--modal-->
-<div th:insert="~{/components/modal/modal-copy}"></div>
-<div th:insert="~{/components/modal/modal-rename}"></div>
-<div th:insert="~{/components/modal/modal-create-folder}"></div>
+<div th:insert="~{components/modal/modal-copy}"></div>
+<div th:insert="~{components/modal/modal-rename}"></div>
+<div th:insert="~{components/modal/modal-create-folder}"></div>
 <!--modal-->
 
 <!--footer-->
-<div th:insert="~{/components/footer}"></div>
+<div th:insert="~{components/footer}"></div>
 <!--footer-->
 
 <!--popup-->
-<th:block th:insert="~{/components/popup-message/popup-cookies-message}"></th:block>
+<th:block th:insert="~{components/popup-message/popup-cookies-message}"></th:block>
 <div th:if="${typeMessage}">
-    <th:block th:insert="~{/components/popup-message/popup-operation-message}"></th:block>
+    <th:block th:insert="~{components/popup-message/popup-operation-message}"></th:block>
 </div>
 
 <div th:if="${errors}">
-    <th:block th:insert="~{/components/popup-message/popup-errors-message}"></th:block>
+    <th:block th:insert="~{components/popup-message/popup-errors-message}"></th:block>
 </div>
 <!--popup-->
 

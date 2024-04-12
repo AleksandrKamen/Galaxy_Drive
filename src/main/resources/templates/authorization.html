@@ -4,7 +4,7 @@
     <title>Authorization Form</title>
 </head>
 <body>
-<th:block th:insert="~{/components/navbar}"></th:block>
+<th:block th:insert="~{components/navbar}"></th:block>
 
 <section class="main-content">
     <div class="container mt-3">
@@ -15,7 +15,7 @@
                     <span th:text="#{authorization.question.about.account}" class="me-2"></span>
                     <a href="registration" th:text="#{authorization.registration.link}"></a>
                 </h6>
-                <form th:action="@{/login}" method="post">
+                <form th:action="@{login}" method="post">
                     <div class="mb-3">
                         <label for="username" class="form-label" th:text="#{user.name}"></label>
                         <div class="input-group">
@@ -64,11 +64,11 @@
 </div>
 
 <!--footer-->
-<th:block th:insert="~{/components/footer}"></th:block>
+<th:block th:insert="~{components/footer}"></th:block>
 <!--footer-->
 
 <!--popup-->
-<th:block th:insert="~{/components/popup-message/popup-cookies-message}"></th:block>
+<th:block th:insert="~{components/popup-message/popup-cookies-message}"></th:block>
 <!--popup-->
 
 <!--scripts-->
