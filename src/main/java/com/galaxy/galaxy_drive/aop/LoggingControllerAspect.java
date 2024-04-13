@@ -3,6 +3,7 @@ package com.galaxy.galaxy_drive.aop;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
+import org.aspectj.lang.annotation.AfterThrowing;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.stereotype.Component;
 
@@ -20,4 +21,9 @@ public class LoggingControllerAspect {
     public void addLogingPostMappingMethods(JoinPoint joinPoint ,String redirectPageName) {
         log.info("method {} invoke {} page", joinPoint.getSignature().getName(),  redirectPageName);
     }
+    @AfterThrowing(pointcut = "com.galaxy.galaxy_drive.aop.CommonAspect.isControllerLayer()", throwing = "ex")
+    public void addLogingThrowingException(JoinPoint joinPoint, Exception ex) {
+        log.error("error in method {}, message -  {}", joinPoint.getSignature().getName(),  ex.getMessage());
+    }
+
 }

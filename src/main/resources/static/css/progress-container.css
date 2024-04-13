@@ -1,0 +1,10 @@
+/*progress-container*/
+.progress-container{
+    width: 15%;
+    margin-left: 2vw;
+    margin-top: 1vw;
+}
+.progress-container span{
+    white-space: nowrap;
+}
+/*progress-container*/

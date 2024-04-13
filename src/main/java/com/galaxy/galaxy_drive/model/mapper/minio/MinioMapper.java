@@ -16,7 +16,7 @@ public abstract class MinioMapper {
         return new MinioFileDto(
                 FileUtil.getFileNameWithType(object.objectName()),
                 object.objectName(),
-                FileUtil.getSize(object.size()),
+                FileUtil.getFileSize(object.size()),
                 object.lastModified().format(DateTimeFormatter.ofPattern("dd-MM-yyy")),
                 FolderUtil.getParentFolderPath(object.objectName()),
                 FileUtil.getFileType(object.objectName()));

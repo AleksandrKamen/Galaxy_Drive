@@ -7,7 +7,7 @@
             </div>
             <form th:action="@{/create}" method="post">
                 <div class="modal-body">
-                    <input type="text" name="folderName" th:value="#{create.folder.example}" required>
+                    <input type="text" name="folderName" th:value="#{create.folder.example}" maxlength="30" required>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" th:text="#{create.folder.cancel.btn}"></button>

@@ -23,7 +23,7 @@ public class ControllerAdvice {
     }
 
     @ExceptionHandler({MinioCopyException.class, MinioDownloadException.class, MinioRemoveException.class,
-            MinioUploadException.class, MinioDuplicateNameException.class})
+            MinioUploadException.class, MinioDuplicateNameException.class, MemoryLlimitException.class})
     public String handleMinioException(Exception exception,
                                        RedirectAttributes redirectAttributes,
                                        HttpServletRequest request) {

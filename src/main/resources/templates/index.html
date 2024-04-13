@@ -11,6 +11,14 @@
 
 
     <th:block th:insert="~{components/dropdown-menu/dropdown-menu-create}"></th:block>
+    <div class="progress-container">
+        <div class="progress" >
+            <div class="progress-bar" role="progressbar" th:style="'width: ' + ${progressValue} + '%'"
+                 th:aria-valuenow="${progressValue}" aria-valuemin="0" aria-valuemax="100" th:text="${progressValue} + '%'"></div>
+        </div>
+        <span th:text="${processText}"></span>
+    </div>
+
 
     <h4 class="text-center" th:text="#{home.page.greetings}"></h4>
     <th:block th:insert="~{components/search-form}"></th:block>

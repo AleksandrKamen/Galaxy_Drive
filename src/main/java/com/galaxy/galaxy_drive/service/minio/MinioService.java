@@ -34,6 +34,7 @@ public class MinioService {
     MinioProperties minioProperties;
     MinioMapper minioMapper;
     MessageSource messageSource;
+    public static Long MAX_MEMORY = 1073741824L;
 
     public void delete(String fileName, String type) {
         switch (type) {
@@ -100,6 +101,16 @@ public class MinioService {
                 .filter(file -> file.getName().startsWith(fileName))
                 .collect(Collectors.toList());
     }
+
+public boolean isFileExist(String filePath) {
+    try {
+        return minioClient.statObject(StatObjectArgs.builder().bucket(minioProperties.getBucket())
+                .object(filePath)
+                .build()) != null;
+    } catch (Exception e) {
+        return false;
+    }
+}
 
 
     //    ********* Folder *************
@@ -180,8 +191,41 @@ public class MinioService {
         return !getAllObjectInFolder(folderPath, true).isEmpty();
     }
 
+    public Long getUsedMemory(String userFolder) {
+        return getAllObjectInFolder(userFolder, true).stream()
+                .mapToLong(it -> it.size())
+                .sum();
+    }
+
+    public boolean isFileFitOnDisk(String userFolder, Long fileSize) {
+        return MAX_MEMORY - getUsedMemory(userFolder) > fileSize;
+    }
+
+    public Long getObjectSize(String path, String type) {
+        try {
+            if (type.equals("file")) {
+                return minioClient.statObject(StatObjectArgs.builder()
+                                .bucket(minioProperties.getBucket())
+                                .object(path).build())
+                        .size();
+            }
+            return getAllObjectInFolder(path, true)
+                    .stream()
+                    .mapToLong(item -> item.size())
+                    .sum();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0L;
+        }
+    }
+    public Long getPercent(String userFolder){
+       return getUsedMemory(userFolder) * 100 / MAX_MEMORY;
+    }
+
+
     private void copyFile(String currentName, String newName) {
-        if (FileUtil.getFileName(currentName).equals(newName)) {
+        var newFilePath = FolderUtil.getParentFolderPath(currentName) + "/" + newName + FileUtil.getFileType(currentName);
+        if (FileUtil.getFileName(currentName).equals(newName) || isFileExist(newFilePath)) {
             throw new MinioDuplicateNameException(getErrorMessage("duplicate"));
         }
         try {
@@ -191,7 +235,7 @@ public class MinioService {
                             .object(currentName)
                             .build())
                     .bucket(minioProperties.getBucket())
-                    .object(FolderUtil.getParentFolderPath(currentName) + "/" + newName + FileUtil.getFileType(currentName))
+                    .object(newFilePath)
                     .build());
         } catch (Exception e) {
             throw new MinioCopyException(getErrorMessage("copy") + e.getMessage());
@@ -211,7 +255,7 @@ public class MinioService {
 
     private void copyFolder(String folderPath, String newName) {
         var newPathFolder = FolderUtil.getNewPathFolder(folderPath, newName);
-        if (folderPath.equals(newPathFolder)) {
+        if (folderPath.equals(newPathFolder) || isFolderExist(newPathFolder)) {
             throw new MinioDuplicateNameException(getErrorMessage("duplicate"));
         }
         try {
