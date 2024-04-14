@@ -62,8 +62,8 @@ public class UserService implements UserDetailsService {
             minioService.createUserFolder(user.getId());
             return userMapper.userToUserReadDto(user);
         } catch (MinioCreateException minioCreateException) {
-                throw minioCreateException;
-        } catch (Exception e){
+            throw minioCreateException;
+        } catch (Exception e) {
             throw new UserAlreadyExistsException(messageSource.getMessage(
                     "error.message.userExist",
                     new String[]{newUser.getUserName()},
@@ -73,14 +73,12 @@ public class UserService implements UserDetailsService {
 
     @Transactional
     public Optional<User> createUserIfNotExist(OidcUserRequest userRequest) {
-       var email = userRequest.getIdToken().getEmail();
-       return createUserAndFolderIfNotExist(email, SignupMethod.GOOGLE);
+        return createUserAndFolderIfNotExist(userRequest.getIdToken().getEmail(), SignupMethod.GOOGLE);
     }
 
     @Transactional
-    public Optional<User> createUserIfNotExist(OAuth2User oAuth2User)  {
-       var login = oAuth2User.getAttribute("login").toString();
-       return createUserAndFolderIfNotExist(login, SignupMethod.GITGUB);
+    public Optional<User> createUserIfNotExist(OAuth2User oAuth2User) {
+        return createUserAndFolderIfNotExist(oAuth2User.getAttribute("login").toString(), SignupMethod.GITGUB);
     }
 
     @Override
@@ -95,17 +93,17 @@ public class UserService implements UserDetailsService {
     }
 
     @Transactional
-    public Optional<User>  createUserAndFolderIfNotExist(String userName, SignupMethod signupMethod)  {
+    public Optional<User> createUserAndFolderIfNotExist(String userName, SignupMethod signupMethod) {
         if (!userRepository.existsByUserName(userName)) {
             try {
-                var save = userRepository.save(User.builder()
+                var user = userRepository.save(User.builder()
                         .userName(userName)
                         .password(passwordEncoder.encode(UUID.randomUUID().toString()))
                         .role(Role.USER)
                         .signupMethod(signupMethod)
                         .build());
-                minioService.createUserFolder(save.getId());
-                return Optional.of(save);
+                minioService.createUserFolder(user.getId());
+                return Optional.of(user);
             } catch (MinioCreateException minioCreateException) {
                 throw minioCreateException;
             }

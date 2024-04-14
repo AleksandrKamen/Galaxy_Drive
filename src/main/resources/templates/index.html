@@ -9,16 +9,15 @@
 <div th:insert="~{components/navbar}"></div>
 <section class="main-content">
 
-
     <th:block th:insert="~{components/dropdown-menu/dropdown-menu-create}"></th:block>
     <div class="progress-container">
-        <div class="progress" >
+        <div class="progress">
             <div class="progress-bar" role="progressbar" th:style="'width: ' + ${progressValue} + '%'"
-                 th:aria-valuenow="${progressValue}" aria-valuemin="0" aria-valuemax="100" th:text="${progressValue} + '%'"></div>
+                 th:aria-valuenow="${progressValue}" aria-valuemin="0" aria-valuemax="100"
+                 th:text="${progressValue} + '%'"></div>
         </div>
         <span th:text="${processText}"></span>
     </div>
-
 
     <h4 class="text-center" th:text="#{home.page.greetings}"></h4>
     <th:block th:insert="~{components/search-form}"></th:block>
@@ -35,7 +34,7 @@
                          parentFolderPath=${folder.getParentFolderPath()}">
                 <th scope="row" class="text-start">
                     <a th:href="'/?path=' + ${folderPath}">
-                        <i class="bi bi-folder" style="color: Grey;"></i>
+                        <i class="bi bi-folder"></i>
                         <span th:text="${folderName}"></span>
                     </a>
                 </th>
@@ -88,36 +87,21 @@
     </div>
 </section>
 
-<!--modal-->
 <div th:insert="~{components/modal/modal-copy}"></div>
 <div th:insert="~{components/modal/modal-rename}"></div>
 <div th:insert="~{components/modal/modal-create-folder}"></div>
-<!--modal-->
-
-<!--footer-->
 <div th:insert="~{components/footer}"></div>
-<!--footer-->
 
-<!--popup-->
 <th:block th:insert="~{components/popup-message/popup-cookies-message}"></th:block>
-<div th:if="${typeMessage}">
-    <th:block th:insert="~{components/popup-message/popup-operation-message}"></th:block>
-</div>
+<div th:if="${typeMessage}" th:insert="~{components/popup-message/popup-operation-message}"></div>
+<div th:if="${errors}" th:insert="~{components/popup-message/popup-errors-message}"></div>
 
-<div th:if="${errors}">
-    <th:block th:insert="~{components/popup-message/popup-errors-message}"></th:block>
-</div>
-<!--popup-->
-
-
-<!--scripts-->
 <th:block th:insert="~{components/head :: #bootstrapScript}"></th:block>
 <script src="/js/type-filter.js"></script>
 <script src="/js/rename-function.js"></script>
 <script src="/js/copy-function.js"></script>
 <script src="/js/popup-cookies-message.js"></script>
 <script src="/js/checkFileSize.js"></script>
-<!--scripts-->
 
 </body>
 </html>

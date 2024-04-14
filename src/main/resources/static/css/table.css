@@ -1,4 +1,3 @@
-/*table-container*/
 .table-container{
     display: flex;
     width: 75%;
@@ -11,4 +10,6 @@
 .table{
     width: 100%;
 }
-/*table-container*/
+.bi-folder{
+    color: Grey;
+}

@@ -14,14 +14,10 @@ class FileUtilTest {
 
     @Test
     void getFileName() {
-        var actualResult = FileUtil.getFileName(FILE_PATH_TEST);
+        var actualResult = FileUtil.getFileName(FILE_PATH_TEST, false);
+        var actualResult2 = FileUtil.getFileName(FILE_PATH_TEST, true);
         assertThat(actualResult).isEqualTo("test");
-    }
-
-    @Test
-    void getFileNameWithType() {
-        var actualResult = FileUtil.getFileNameWithType(FILE_PATH_TEST);
-        assertThat(actualResult).isEqualTo("test.txt");
+        assertThat(actualResult2).isEqualTo("test.txt");
     }
 
     @Test

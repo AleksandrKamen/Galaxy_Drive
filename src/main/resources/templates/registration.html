@@ -30,15 +30,18 @@
                             <span class="input-group-text"><i class="fas fa-lock"></i></span>
                             <input type="password" class="form-control" id="rawPassword" name="rawPassword"
                                    th:placeholder="#{placeholder.password}" minlength="3" maxlength="10" required>
-                            <button class="btn btn-outline-secondary toggle-password" type="button" id="togglePassword" th:text="#{show.btn}"></button>
+                            <button class="btn btn-outline-secondary toggle-password" type="button" id="togglePassword"
+                                    th:text="#{show.btn}"></button>
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label for="confirmPassword" class="form-label" th:text="#{registration.confirm.password}"></label>
+                        <label for="confirmPassword" class="form-label"
+                               th:text="#{registration.confirm.password}"></label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="fas fa-lock"></i></span>
                             <input type="password" class="form-control" id="confirmPassword" name="confirmPassword"
-                                   th:placeholder="#{registration.placeholder.confirm.password}" minlength="3" maxlength="10" required>
+                                   th:placeholder="#{registration.placeholder.confirm.password}" minlength="3"
+                                   maxlength="10" required>
                             <button class="btn btn-outline-secondary toggle-password" type="button"
                                     id="toggleconfirmPassword" th:text="#{show.btn}"></button>
                         </div>
@@ -46,9 +49,11 @@
 
                     <div class="mb-3 form-check">
                         <input type="checkbox" class="form-check-input" id="terms-and-conditions" required>
-                        <label class="form-check-label" for="terms-and-conditions" th:text="#{registration.robot.check}"></label>
+                        <label class="form-check-label" for="terms-and-conditions"
+                               th:text="#{registration.robot.check}"></label>
                     </div>
-                    <button type="submit" class="btn btn-primary" onclick="disableButton(this)" th:text="#{registration.title}"></button>
+                    <button type="submit" class="btn btn-primary" onclick="disableButton(this)"
+                            th:text="#{registration.title}"></button>
                 </form>
             </div>
         </div>
@@ -67,20 +72,14 @@
     <span id="loadingText" th:text="#{loading}"></span>
 </div>
 
-<!--footer-->
 <div th:insert="~{components/footer}"></div>
-<!--footer-->
 
-<!--scripts-->
 <th:block th:insert="~{components/head :: #bootstrapScript}"></th:block>
-<script src="/js/toggle-password.js" ></script>
-<script src="/js/loading.js" ></script>
+<script src="/js/toggle-password.js"></script>
+<script src="/js/loading.js"></script>
 <script src="/js/popup-cookies-message.js"></script>
-<!--scripts-->
 
-<!--popup-->
 <th:block th:insert="~{components/popup-message/popup-cookies-message}"></th:block>
-<!--popup-->
 
 </body>
 </html>

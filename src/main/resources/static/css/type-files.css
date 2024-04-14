@@ -1,4 +1,3 @@
-/*files-type filter*/
 .files-type {
     margin-top: 2vw;
     margin-left: 20vw;
@@ -33,4 +32,3 @@
 .files-type input[type=radio]:checked + label {
     background: #ADD8E6;
 }
-/*files-type filter*/

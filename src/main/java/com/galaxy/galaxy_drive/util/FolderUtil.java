@@ -7,7 +7,7 @@ import java.util.List;
 
 @UtilityClass
 public class FolderUtil {
-   private Integer PARENT_FOLDERS_COUNT = 3;
+   private static final Integer PARENT_FOLDERS_COUNT = 3;
 
     public String getUserFolderName(Long id) {
         return "user-" + id + "-files";
@@ -17,7 +17,7 @@ public class FolderUtil {
         var breadcrumbs = new ArrayList<String>();
         breadcrumbs.add(folderPath);
         while (folderPath.contains("/")) {
-            var parentFolderPath = FolderUtil.getParentFolderPath(folderPath);
+            var parentFolderPath = getParentFolderPath(folderPath);
             breadcrumbs.add(0, parentFolderPath);
             folderPath = parentFolderPath;
         }
@@ -44,6 +44,11 @@ public class FolderUtil {
     public String getNewPathFolder(String currentName, String newName){
         return getParentFolderPath(currentName) + "/" + newName;
     }
+    public String getPathParam(String referer){
+        var indexOf = referer.indexOf("=") + 1;
+        return referer.contains("&") ?  referer.substring(indexOf, referer.indexOf("&")) : referer.substring(indexOf);
+    }
+
 
 
 

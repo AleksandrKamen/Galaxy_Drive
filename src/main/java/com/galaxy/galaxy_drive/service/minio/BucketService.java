@@ -21,8 +21,7 @@ public class BucketService {
     @SneakyThrows
     @PostConstruct
     public void createBucketIfNotExist() {
-        boolean found = isBucketExist(minioProperties.getBucket());
-        if (!found) {
+        if (!isBucketExist(minioProperties.getBucket())) {
             minioClient.makeBucket(MakeBucketArgs.builder()
                     .bucket(minioProperties.getBucket())
                     .build());

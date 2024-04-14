@@ -6,15 +6,12 @@
     <title>Search</title>
 </head>
 <body>
-<!--navbar-->
 <th:block th:insert="~{components/navbar}"></th:block>
-<!--navbar-->
+
 <section class="main-content">
 
     <th:block th:insert="~{components/search-form}"></th:block>
-
     <h4 class="text-center mt-5" th:text="#{search.searching.results}"></h4>
-
     <div class="table-container">
         <table class="table table-hover">
             <th:block th:insert="~{components/column-names}"></th:block>
@@ -25,7 +22,7 @@
                          parentFolderPath=${folder.getParentFolderPath()}">
                 <th scope="row" class="text-start">
                     <a th:href="'/?path=' + ${folderPath}">
-                        <i class="bi bi-folder" style="color: Grey;"></i>
+                        <i class="bi bi-folder"></i>
                         <span th:text="${folderName}"></span>
                     </a>
                 </th>
@@ -77,40 +74,27 @@
         </table>
     </div>
 
-
-    <!--Not found-->
     <div class="result-Not-Found text-center" th:if="${foundFiles.isEmpty() && foundFolders.isEmpty()}">
         <img src="/picture/search-not-found.png">
         <h4 th:text="#{search.result.not.found}"></h4>
         <span th:text="#{search.change.request}"></span>
     </div>
-    <!--Not found-->
 </section>
 
-<!-- modal-->
 <div th:insert="~{components/modal/modal-copy}"></div>
 <div th:insert="~{components/modal/modal-rename}"></div>
 <th:block th:insert="~{components/modal/modal-create-folder}"></th:block>
-<!-- modal-->
 
-<!--footer-->
 <div th:insert="~{components/footer}"></div>
-<!--footer-->
 
-<!--popup-->
 <th:block th:insert="~{components/popup-message/popup-cookies-message}"></th:block>
-<div th:if="${typeMessage}">
-    <th:block th:insert="~{components/popup-message/popup-operation-message}"></th:block>
-</div>
-<!--popup-->
+<div th:if="${typeMessage}" th:insert="~{components/popup-message/popup-operation-message}"></div>
+<div th:if="${errors}" th:insert="~{components/popup-message/popup-errors-message}"></div>
 
-
-<!--scripts-->
 <th:block th:insert="~{components/head :: #bootstrapScript}"></th:block>
 <script src="/js/rename-function.js"></script>
 <script src="/js/copy-function.js"></script>
 <script src="/js/popup-cookies-message.js"></script>
-<!--scripts-->
 
 </body>
 </html>

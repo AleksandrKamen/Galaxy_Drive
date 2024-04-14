@@ -38,7 +38,7 @@ public class SecurityConfiguration {
         return http.build();
     }
 
-    private OAuth2UserService<OidcUserRequest, OidcUser> oidcUserService()  {
+    private OAuth2UserService<OidcUserRequest, OidcUser> oidcUserService() {
         return userRequest -> {
             userService.createUserIfNotExist(userRequest);
             var userDetails = userService.loadUserByUsername(userRequest.getIdToken().getEmail());

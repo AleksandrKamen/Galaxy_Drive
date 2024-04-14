@@ -4,9 +4,6 @@ import com.galaxy.galaxy_drive.exception.minio.FolderNotFoundException;
 import com.galaxy.galaxy_drive.model.dto.user.UserReadDto;
 import com.galaxy.galaxy_drive.service.minio.MinioService;
 import com.galaxy.galaxy_drive.service.user.UserService;
-import com.galaxy.galaxy_drive.util.AuthenticationUtil;
-import com.galaxy.galaxy_drive.util.FileUtil;
-import com.galaxy.galaxy_drive.util.FolderUtil;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -28,6 +25,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static com.galaxy.galaxy_drive.util.AuthenticationUtil.*;
+import static com.galaxy.galaxy_drive.util.FileUtil.*;
+import static com.galaxy.galaxy_drive.util.FolderUtil.*;
+
 @Controller
 @RequestMapping("/")
 @RequiredArgsConstructor
@@ -43,9 +44,9 @@ public class IndexController {
                            @SessionAttribute(value = "user", required = false) UserReadDto user,
                            Model model) {
         if (user == null) {
-            user = userService.findByUserName(AuthenticationUtil.getUserName(principal));
+            user = userService.findByUserName(getUserName(principal));
         }
-       var userFolder = FolderUtil.getUserFolderName(user.getId());
+        var userFolder = getUserFolderName(user.getId());
 
         if (path == null || path.isEmpty()) {
             return "redirect:/?path=" + userFolder;
@@ -59,7 +60,7 @@ public class IndexController {
                 "user", user,
                 "allFoldersInFolder", minioService.getAllFoldersInFolder(path),
                 "allFilesInFolder", minioService.getAllFilesInFolder(path),
-                "parentFolders", FolderUtil.getBreadcrumbs(path),
+                "parentFolders", getBreadcrumbs(path),
                 "userFolder", userFolder,
                 "path", path,
                 "processText", minioService.getProcessText(userFolder),
@@ -99,7 +100,7 @@ public class IndexController {
     public String createFolder(String folderName,
                                RedirectAttributes redirectAttributes,
                                @RequestHeader(value = "Referer") String referer) {
-        minioService.createEmptyFolderWithName(getPath(referer), folderName);
+        minioService.createEmptyFolderWithName(getPathParam(referer), folderName);
         addRedirectAttributes(redirectAttributes, "create", List.of(folderName));
         return "redirect:" + referer;
     }
@@ -111,8 +112,8 @@ public class IndexController {
                              @RequestHeader(value = "Referer") String referer) {
         minioService.delete(objectName, type);
         addRedirectAttributes(redirectAttributes, "delete", List.of(getName(objectName, type)));
-        if (!minioService.isFolderExist(getPath(referer))) {
-            return "redirect:" + FolderUtil.getParentFolderPath(referer);
+        if (!referer.contains("query") && !minioService.isFolderExist(getPathParam(referer))) {
+            return "redirect:" + getParentFolderPath(referer);
         }
         return "redirect:" + referer;
     }
@@ -140,12 +141,12 @@ public class IndexController {
         return "redirect:" + referer;
     }
 
-
     @GetMapping("downloadFile")
     public ResponseEntity<InputStreamResource> downloadFile(@RequestParam("fileName") String filePath) {
         var stream = minioService.downloadFile(filePath);
         var headers = new HttpHeaders();
-        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + URLEncoder.encode(FileUtil.getFileNameWithType(filePath), StandardCharsets.UTF_8));
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" +
+                URLEncoder.encode(getFileName(filePath, true), StandardCharsets.UTF_8));
         return ResponseEntity.ok()
                 .headers(headers)
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
@@ -157,7 +158,7 @@ public class IndexController {
         var zipData = minioService.downloadFolder(folderPath);
         var headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-        headers.setContentDispositionFormData("attachment", UriEncoder.encode(FolderUtil.getNameFolder(folderPath)) + ".zip");
+        headers.setContentDispositionFormData("attachment", UriEncoder.encode(getNameFolder(folderPath)) + ".zip");
         return ResponseEntity
                 .ok()
                 .headers(headers)
@@ -170,20 +171,15 @@ public class IndexController {
     }
 
     private String getName(String path, String type) {
-        return type.equals("folder") ? FolderUtil.getNameFolder(path) : FileUtil.getFileNameWithType(path);
-    }
-
-    private String getPath(String referer) {
-        var indexOf = referer.indexOf("=") + 1;
-        return referer.contains("&") ?  referer.substring(indexOf, referer.indexOf("&")) : referer.substring(indexOf);
+        return type.equals("folder") ? getNameFolder(path) : getFileName(path, true);
     }
 
     private String getFilePath(String referer, MultipartFile file) {
         var count = 1;
-        var filePath = UriEncoder.decode(getPath(referer)) + "/" + file.getOriginalFilename();
+        var filePath = UriEncoder.decode(getPathParam(referer)) + "/" + file.getOriginalFilename();
         var newFilePath = filePath;
         while (minioService.isFileExist(newFilePath)) {
-            newFilePath = filePath.substring(0, filePath.indexOf('.')) + "(" + count++ + ")" + FileUtil.getFileType(file.getOriginalFilename());
+            newFilePath = filePath.substring(0, filePath.indexOf('.')) + "(" + count++ + ")" + getFileType(file.getOriginalFilename());
         }
         return newFilePath;
     }

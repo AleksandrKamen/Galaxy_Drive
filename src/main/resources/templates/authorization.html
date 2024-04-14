@@ -63,20 +63,13 @@
     <span id="loadingText" th:text="#{loading}"></span>
 </div>
 
-<!--footer-->
 <th:block th:insert="~{components/footer}"></th:block>
-<!--footer-->
-
-<!--popup-->
 <th:block th:insert="~{components/popup-message/popup-cookies-message}"></th:block>
-<!--popup-->
-
-<!--scripts-->
 <th:block th:insert="~{components/head :: #bootstrapScript}"></th:block>
+
 <script src="/js/popup-cookies-message.js"></script>
 <script src="/js/toggle-password.js" ></script>
 <script src="/js/loading.js" ></script>
-<!--scripts-->
 
 </body>
 </html>

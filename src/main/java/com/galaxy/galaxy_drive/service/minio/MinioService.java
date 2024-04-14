@@ -252,7 +252,7 @@ public boolean isFileExist(String filePath) {
 
     private void copyFile(String currentName, String newName) {
         var newFilePath = FolderUtil.getParentFolderPath(currentName) + "/" + newName + FileUtil.getFileType(currentName);
-        if (FileUtil.getFileName(currentName).equals(newName) || isFileExist(newFilePath)) {
+        if (FileUtil.getFileName(currentName, false).equals(newName) || isFileExist(newFilePath)) {
             throw new MinioDuplicateNameException(getErrorMessage("duplicate"));
         }
         try {

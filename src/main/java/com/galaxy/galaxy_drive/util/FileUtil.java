@@ -12,25 +12,23 @@ public class FileUtil {
         return filePath.substring(filePath.indexOf("."));
     }
 
-    public String getFileName(String filePath) {
-        return filePath.substring(filePath.lastIndexOf("/") + 1, filePath.indexOf("."));
-    }
-    public String getFileNameWithType(String filePath) {
-        return filePath.substring(filePath.lastIndexOf("/") + 1);
+    public String getFileName(String filePath, boolean withType) {
+        var lastIndexOf = filePath.lastIndexOf("/") + 1;
+        return withType ? filePath.substring(lastIndexOf)
+                       : filePath.substring(lastIndexOf, filePath.indexOf("."));
     }
 
-    public String getFileSize(Long size){
+    public String getFileSize(Long size) {
 
-        if (size >= GB_SIZE){
-            return size/GB_SIZE + " GB";
+        if (size >= GB_SIZE) {
+            return size / GB_SIZE + " GB";
         }
-        if (size > MB_SIZE){
-            return size/MB_SIZE + " MB";
+        if (size > MB_SIZE) {
+            return size / MB_SIZE + " MB";
         }
-        if (size > KB_SIZE){
-            return size/KB_SIZE + " KB";
+        if (size > KB_SIZE) {
+            return size / KB_SIZE + " KB";
         }
         return size + " B";
     }
-
 }
