@@ -38,12 +38,13 @@ public class FolderUtil {
             var substring = folderPath.substring(0, folderPath.length() - 1);
             return substring.substring(substring.lastIndexOf("/")+1);
         }
-        return  UriEncoder.encode(folderPath.substring(folderPath.lastIndexOf("/") + 1));
+        return  folderPath.substring(folderPath.lastIndexOf("/") + 1);
     }
 
     public String getNewPathFolder(String currentName, String newName){
         return getParentFolderPath(currentName) + "/" + newName;
     }
+
 
 
 }

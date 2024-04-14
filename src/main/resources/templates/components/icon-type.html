@@ -1,5 +1,5 @@
 <body>
-<span th:switch="${fileType}">
+<span th:switch="${fileType.toLowerCase()}">
      <span th:case="'.png'"><i class="bi bi-filetype-png" style=" color: DarkRed;"></i></span>
      <span th:case="'.jpg'"><i class="bi bi-filetype-jpg" style=" color: DarkRed;"></i></span>
      <span th:case="'.pdf'"><i class="bi bi-filetype-pdf" style=" color: Red;"></i></span>

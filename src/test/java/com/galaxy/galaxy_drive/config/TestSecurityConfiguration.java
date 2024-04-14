@@ -16,12 +16,6 @@ public class TestSecurityConfiguration {
                         .anyRequest().authenticated())
                 .formLogin(login -> login.loginPage("/login")
                         .defaultSuccessUrl("/", true));
-//                .oauth2Login(config -> config
-//                        .loginPage("/login")
-//                        .userInfoEndpoint(userInfo -> userInfo
-//                                .oidcUserService(oidcUserService())
-//                                .userService(oauth2UserService()))
-//                        .defaultSuccessUrl("/", true));
         return http.build();
     }
 }

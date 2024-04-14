@@ -19,9 +19,9 @@ public class FileUtil {
         return filePath.substring(filePath.lastIndexOf("/") + 1);
     }
 
-    public String getSize(Long size){
+    public String getFileSize(Long size){
 
-        if (size > GB_SIZE){
+        if (size >= GB_SIZE){
             return size/GB_SIZE + " GB";
         }
         if (size > MB_SIZE){
