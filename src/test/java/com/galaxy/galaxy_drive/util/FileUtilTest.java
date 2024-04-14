@@ -26,8 +26,12 @@ class FileUtilTest {
 
     @Test
     void getSize() {
-        var actualResult = FileUtil.getSize(10240L);
+        var actualResult = FileUtil.getFileSize(10240L);
+        var actualResult2 = FileUtil.getFileSize(10485760L);
+        var actualResult3 = FileUtil.getFileSize(10737418240L);
         assertThat(actualResult).isEqualTo("10 KB");
+        assertThat(actualResult2).isEqualTo("10 MB");
+        assertThat(actualResult3).isEqualTo("10 GB");
     }
 
 }

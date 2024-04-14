@@ -34,7 +34,7 @@ public class MinioService {
     MinioProperties minioProperties;
     MinioMapper minioMapper;
     MessageSource messageSource;
-    public static Long MAX_MEMORY = 1073741824L;
+    static Long MAX_MEMORY = 1073741824L;
 
     public void delete(String fileName, String type) {
         switch (type) {
@@ -44,7 +44,14 @@ public class MinioService {
         }
     }
 
-    public void copy(String currentName, String copyName, String type) {
+    public void copy(String userFolder, String currentName, String copyName, String type) {
+        if (!isFileFitOnDisk(userFolder, getObjectSize(currentName, type))) {
+            throw new MemoryLlimitException(getErrorMessage("memory.limit"));
+        }
+        if (!isNameCorrect(copyName)){
+            throw new IncorrectNameException(getErrorMessage("incorrect.name"));
+        }
+
         switch (type) {
             case "file" -> copyFile(currentName, copyName);
             case "folder" -> copyFolder(currentName, copyName);
@@ -52,6 +59,9 @@ public class MinioService {
     }
 
     public void rename(String currentName, String newName, String type) {
+        if (!isNameCorrect(newName)){
+            throw new IncorrectNameException(getErrorMessage("incorrect.name"));
+        }
         switch (type) {
             case "file" -> copyFile(currentName, newName);
             case "folder" -> copyFolder(currentName, newName);
@@ -60,7 +70,6 @@ public class MinioService {
     }
 
 
-    //    ********* Files *******************
     public List<MinioFileDto> getAllFilesInFolder(String folderName) {
         return getAllObjectInFolder(folderName, false)
                 .stream()
@@ -112,8 +121,6 @@ public boolean isFileExist(String filePath) {
     }
 }
 
-
-    //    ********* Folder *************
     public List<MinioFolderDto> getAllFoldersInFolder(String folderName) {
         return getAllObjectInFolder(folderName, false)
                 .stream()
@@ -143,6 +150,13 @@ public boolean isFileExist(String filePath) {
     }
 
     public void createEmptyFolderWithName(String parentFolder, String folderName) {
+        if (!isNameCorrect(folderName)){
+            throw new IncorrectNameException(getErrorMessage("incorrect.name"));
+        }
+        if (isFolderExist(parentFolder + "/" + folderName)) {
+            throw new MinioDuplicateNameException(getErrorMessage("duplicate"));
+        }
+
         try {
             minioClient.putObject(PutObjectArgs.builder()
                     .bucket(minioProperties.getBucket())
@@ -200,6 +214,19 @@ public boolean isFileExist(String filePath) {
     public boolean isFileFitOnDisk(String userFolder, Long fileSize) {
         return MAX_MEMORY - getUsedMemory(userFolder) > fileSize;
     }
+    public void checkFileFitOnDisk(String userFolder, long totalSize) {
+        if (!isFileFitOnDisk(userFolder, totalSize)) {
+            throw new MemoryLlimitException(getErrorMessage("memory.limit"));
+        }
+    }
+
+    public String getProcessText(String userFolder){
+             return messageSource.getMessage(
+                "process.text",
+                new String[]{FileUtil.getFileSize(getUsedMemory(userFolder)), FileUtil.getFileSize(MAX_MEMORY)},
+                LocaleContextHolder.getLocale());
+    }
+
 
     public Long getObjectSize(String path, String type) {
         try {
@@ -251,6 +278,10 @@ public boolean isFileExist(String filePath) {
         } catch (Exception e) {
             throw new MinioRemoveException(getErrorMessage("remove") + e.getMessage());
         }
+    }
+
+    private boolean isNameCorrect(String name) {
+        return name.matches("^[\\p{L}0-9_-]{1,30}$");
     }
 
     private void copyFolder(String folderPath, String newName) {

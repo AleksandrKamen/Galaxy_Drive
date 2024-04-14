@@ -1,43 +1,37 @@
 package com.galaxy.galaxy_drive.controller;
 
+import com.galaxy.galaxy_drive.model.dto.user.UserReadDto;
 import com.galaxy.galaxy_drive.service.minio.MinioService;
-import com.galaxy.galaxy_drive.service.user.UserService;
-import com.galaxy.galaxy_drive.util.AuthenticationUtil;
-import com.galaxy.galaxy_drive.util.FolderUtil;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
 @Controller
 @RequestMapping("/search")
 @RequiredArgsConstructor
+@SessionAttributes("user")
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class SearchController {
-     MinioService minioService;
-     UserService userService;
+    MinioService minioService;
+
     @GetMapping
     public String searchPage(@RequestParam String query,
-                             @AuthenticationPrincipal Object principal,
-                             Model model){
-        var user = userService.findByUserName(AuthenticationUtil.getUserName(principal));
-        var userFolderPath = FolderUtil.getUserFolderName(user.getId());
-
+                             @SessionAttribute(value = "user") UserReadDto user,
+                             @SessionAttribute(value = "userFolder") String userFolder,
+                             Model model) {
         model.addAllAttributes(
                 Map.of(
                         "user", user,
-                        "foundFolders", minioService.searchFolderByName(userFolderPath, query),
-                        "foundFiles", minioService.searchFileByName(userFolderPath, query),
+                        "foundFolders", minioService.searchFolderByName(userFolder, query),
+                        "foundFiles", minioService.searchFileByName(userFolder, query),
                         "query", query,
-                        "userFolderName", userFolderPath)
-                );
+                        "userFolder", userFolder)
+        );
         return "search";
     }
 }

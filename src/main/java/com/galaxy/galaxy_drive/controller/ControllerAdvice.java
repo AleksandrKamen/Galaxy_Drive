@@ -8,7 +8,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
 import java.util.List;
 
 @org.springframework.web.bind.annotation.ControllerAdvice
@@ -23,7 +22,7 @@ public class ControllerAdvice {
     }
 
     @ExceptionHandler({MinioCopyException.class, MinioDownloadException.class, MinioRemoveException.class,
-            MinioUploadException.class, MinioDuplicateNameException.class, MemoryLlimitException.class})
+            MinioUploadException.class, MinioDuplicateNameException.class, MemoryLlimitException.class, IncorrectNameException.class})
     public String handleMinioException(Exception exception,
                                        RedirectAttributes redirectAttributes,
                                        HttpServletRequest request) {
@@ -32,17 +31,17 @@ public class ControllerAdvice {
     }
 
     @ExceptionHandler(AccessDeniedException.class)
-    public String handleAccessDeniedException(AccessDeniedException exception) {
+    public String handleAccessDeniedException() {
         return "errors_page/error403";
     }
 
     @ExceptionHandler(FolderNotFoundException.class)
-    public String handleFolderNotFoundException(FolderNotFoundException exception) {
+    public String handleFolderNotFoundException() {
         return "errors_page/error404";
     }
 
     @ExceptionHandler({MinioCreateException.class, UserNotFoundException.class, Exception.class})
-    public String handleException(Exception exception) {
+    public String handleException() {
         return "errors_page/error500";
     }
 }
