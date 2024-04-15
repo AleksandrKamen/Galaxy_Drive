@@ -4,10 +4,8 @@ import com.galaxy.galaxy_drive.exception.minio.*;
 import com.galaxy.galaxy_drive.model.dto.minio.MinioFileDto;
 import com.galaxy.galaxy_drive.model.dto.minio.MinioFolderDto;
 import com.galaxy.galaxy_drive.model.mapper.minio.MinioMapper;
-import com.galaxy.galaxy_drive.props.MinioProperties;
-import com.galaxy.galaxy_drive.util.FileUtil;
-import com.galaxy.galaxy_drive.util.FolderUtil;
-import io.minio.*;
+import com.galaxy.galaxy_drive.model.repository.MinioRepository;
+import io.minio.GetObjectResponse;
 import io.minio.messages.Item;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -16,41 +14,42 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.yaml.snakeyaml.util.UriEncoder;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import static com.galaxy.galaxy_drive.util.FileUtil.*;
+import static com.galaxy.galaxy_drive.util.FolderUtil.*;
+
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class MinioService {
-    MinioClient minioClient;
-    MinioProperties minioProperties;
     MinioMapper minioMapper;
     MessageSource messageSource;
+    MinioRepository minioRepository;
     static Long MAX_MEMORY = 1073741824L;
 
+//    ALL
     public void delete(String fileName, String type) {
         switch (type) {
             case "file" -> removeObject(fileName);
-            case "folder" -> getAllObjectInFolder(fileName, true).stream()
+            case "folder" -> minioRepository.getAllObjectInFolder(fileName, true).stream()
                     .forEach(it -> removeObject(it.objectName()));
         }
     }
 
     public void copy(String userFolder, String currentName, String copyName, String type) {
-        if (!isFileFitOnDisk(userFolder, getObjectSize(currentName, type))) {
-            throw new MemoryLlimitException(getErrorMessage("memory.limit"));
-        }
-        if (!isNameCorrect(copyName)){
+        if (!isNameCorrect(copyName)) {
             throw new IncorrectNameException(getErrorMessage("incorrect.name"));
         }
+        checkFileFitOnDisk(userFolder, getObjectSize(copyName, type));
 
         switch (type) {
             case "file" -> copyFile(currentName, copyName);
@@ -59,7 +58,7 @@ public class MinioService {
     }
 
     public void rename(String currentName, String newName, String type) {
-        if (!isNameCorrect(newName)){
+        if (!isNameCorrect(newName)) {
             throw new IncorrectNameException(getErrorMessage("incorrect.name"));
         }
         switch (type) {
@@ -69,9 +68,9 @@ public class MinioService {
         delete(currentName, type);
     }
 
-
+    // File
     public List<MinioFileDto> getAllFilesInFolder(String folderName) {
-        return getAllObjectInFolder(folderName, false)
+        return minioRepository.getAllObjectInFolder(folderName, false)
                 .stream()
                 .filter(item -> !item.isDir())
                 .filter(item -> !item.objectName().equals(folderName + "/"))
@@ -80,49 +79,54 @@ public class MinioService {
     }
 
     public void uploadFile(MultipartFile file, String path) {
-        try {
-            minioClient.putObject(PutObjectArgs.builder()
-                    .bucket(minioProperties.getBucket())
-                    .stream(file.getInputStream(), file.getSize(), -1)
-                    .object(path)
-                    .build());
-        } catch (Exception e) {
-            throw new MinioUploadException(getErrorMessage("upload") + e.getMessage());
-        }
+        try{
+            minioRepository.putObject(path, file.getInputStream(), file.getSize());
+    } catch (Exception e) {
+        throw new MinioUploadException(getErrorMessage("upload") + e.getMessage());
+    }
     }
 
     public GetObjectResponse downloadFile(String fileName) {
         try {
-            return minioClient.getObject(
-                    GetObjectArgs.builder()
-                            .bucket(minioProperties.getBucket())
-                            .object(fileName)
-                            .build());
-        } catch (Exception e) {
-            throw new MinioDownloadException(getErrorMessage("download") + e.getMessage());
-        }
+            return minioRepository.downloadObject(fileName);
+    } catch (Exception e) {
+        throw new MinioDownloadException(getErrorMessage("download") + e.getMessage());
+    }
     }
 
     public List<MinioFileDto> searchFileByName(String folderName, String fileName) {
-        return getAllObjectInFolder(folderName, true).stream()
+        return minioRepository.getAllObjectInFolder(folderName, true).stream()
                 .filter(item -> !item.objectName().endsWith("/"))
                 .map(minioMapper::itemToMinioFileDto)
                 .filter(file -> file.getName().startsWith(fileName))
                 .collect(Collectors.toList());
     }
 
-public boolean isFileExist(String filePath) {
-    try {
-        return minioClient.statObject(StatObjectArgs.builder().bucket(minioProperties.getBucket())
-                .object(filePath)
-                .build()) != null;
+    private boolean isFileExist(String filePath) {
+        try {
+        return minioRepository.isObjectExist(filePath);
     } catch (Exception e) {
         return false;
     }
-}
+    }
+
+    private void copyFile(String currentName, String newName) {
+        var newFilePath = getParentFolderPath(currentName) + "/" + newName + getFileType(currentName);
+        if (getFileName(currentName, false).equals(newName) || isFileExist(newFilePath)) {
+            throw new MinioDuplicateNameException(getErrorMessage("duplicate"));
+        }
+        try {
+            minioRepository.copyObject(currentName, newFilePath);
+        } catch (Exception e) {
+            throw new MinioCopyException(getErrorMessage("copy") + e.getMessage());
+        }
+    }
+
+
+//    Folder
 
     public List<MinioFolderDto> getAllFoldersInFolder(String folderName) {
-        return getAllObjectInFolder(folderName, false)
+        return minioRepository.getAllObjectInFolder(folderName, false)
                 .stream()
                 .filter(item -> item.isDir())
                 .map(item -> minioMapper.stringToMinioFolderDto(item.objectName()))
@@ -130,7 +134,7 @@ public boolean isFileExist(String filePath) {
     }
 
     public Set<String> getAllUsersFolders(String parentFolderName) {
-        return getAllObjectInFolder(parentFolderName, true).stream()
+        return minioRepository.getAllObjectInFolder(parentFolderName, true).stream()
                 .map(item -> item.objectName())
                 .filter(path -> path.indexOf("/") != path.lastIndexOf("/"))
                 .map(path -> path.substring(0, path.lastIndexOf("/") + 1))
@@ -139,46 +143,37 @@ public boolean isFileExist(String filePath) {
 
     public void createUserFolder(Long id) {
         try {
-            minioClient.putObject(PutObjectArgs.builder()
-                    .bucket(minioProperties.getBucket())
-                    .object(FolderUtil.getUserFolderName(id) + "/")
-                    .stream(new ByteArrayInputStream(new byte[0]), 0, -1)
-                    .build());
-        } catch (Exception e) {
+            minioRepository.putObject(getUserFolderName(id) + "/", new ByteArrayInputStream(new byte[0]), 0L);
+        }
+        catch (Exception e) {
             throw new MinioCreateException(getErrorMessage("createFolder") + e.getMessage());
         }
     }
 
-    public void createEmptyFolderWithName(String parentFolder, String folderName) {
-        if (!isNameCorrect(folderName)){
+    public void createEmptyFolder(String parentFolder, String folderName) {
+
+        if (!isNameCorrect(folderName)) {
             throw new IncorrectNameException(getErrorMessage("incorrect.name"));
         }
-        if (isFolderExist(parentFolder + "/" + folderName)) {
+        var folderPath = parentFolder + "/" + folderName;
+
+        if (isFolderExist(folderPath)) {
             throw new MinioDuplicateNameException(getErrorMessage("duplicate"));
         }
 
         try {
-            minioClient.putObject(PutObjectArgs.builder()
-                    .bucket(minioProperties.getBucket())
-                    .object(parentFolder + "/" + folderName + "/")
-                    .stream(new ByteArrayInputStream(new byte[0]), 0, -1)
-                    .build());
+            minioRepository.putObject(folderPath + "/", new ByteArrayInputStream(new byte[0]), 0L);
         } catch (Exception e) {
             throw new MinioUploadException(getErrorMessage("upload") + e.getMessage());
         }
     }
 
-
     public ByteArrayOutputStream downloadFolder(String folderName) {
         try {
             var baos = new ByteArrayOutputStream();
             try (var outputStream = new ZipOutputStream(baos)) {
-                var allObjectsInFolder = getAllObjectInFolder(folderName, true);
-                for (Item result : allObjectsInFolder) {
-                    var object = minioClient.getObject(GetObjectArgs.builder()
-                            .bucket(minioProperties.getBucket())
-                            .object(result.objectName())
-                            .build());
+                for (Item result : minioRepository.getAllObjectInFolder(folderName, true)) {
+                    var object = minioRepository.downloadObject(result.objectName());
                     outputStream.putNextEntry(new ZipEntry(result.objectName()));
                     var buffer = new byte[1024];
                     int length;
@@ -190,8 +185,9 @@ public boolean isFileExist(String filePath) {
             }
             return baos;
         } catch (Exception e) {
-            throw new MinioDownloadException(getErrorMessage("download") + e.getMessage());
+            throw new MinioDownloadException(getErrorMessage("download"));
         }
+
     }
 
     public List<MinioFolderDto> searchFolderByName(String parentFolderName, String folderName) {
@@ -202,128 +198,84 @@ public boolean isFileExist(String filePath) {
     }
 
     public Boolean isFolderExist(String folderPath) {
-        return !getAllObjectInFolder(folderPath, true).isEmpty();
+        return !minioRepository.getAllObjectInFolder(folderPath, true).isEmpty();
     }
 
+    private void copyFolder(String folderPath, String newName) {
+        var newPathFolder = getNewPathFolder(folderPath, newName);
+        if (folderPath.equals(newPathFolder) || isFolderExist(newPathFolder)) {
+            throw new MinioDuplicateNameException(getErrorMessage("duplicate"));
+        }
+        try {
+            minioRepository.getAllObjectInFolder(folderPath, true).stream()
+                    .forEach(it-> minioRepository.copyObject(it.objectName(), it.objectName().replace(folderPath,newPathFolder)));
+        } catch (Exception e) {
+            throw new MinioCopyException(getErrorMessage("copy") + e.getMessage());
+        }
+    }
+//    ALL
+
     public Long getUsedMemory(String userFolder) {
-        return getAllObjectInFolder(userFolder, true).stream()
+        return minioRepository.getAllObjectInFolder(userFolder, true).stream()
                 .mapToLong(it -> it.size())
                 .sum();
     }
 
-    public boolean isFileFitOnDisk(String userFolder, Long fileSize) {
-        return MAX_MEMORY - getUsedMemory(userFolder) > fileSize;
-    }
     public void checkFileFitOnDisk(String userFolder, long totalSize) {
-        if (!isFileFitOnDisk(userFolder, totalSize)) {
+        if (!(MAX_MEMORY - getUsedMemory(userFolder) > totalSize)) {
             throw new MemoryLlimitException(getErrorMessage("memory.limit"));
         }
     }
 
-    public String getProcessText(String userFolder){
-             return messageSource.getMessage(
+    public String getProcessText(String userFolder) {
+        return messageSource.getMessage(
                 "process.text",
-                new String[]{FileUtil.getFileSize(getUsedMemory(userFolder)), FileUtil.getFileSize(MAX_MEMORY)},
+                new String[]{getFileSize(getUsedMemory(userFolder)), getFileSize(MAX_MEMORY)},
                 LocaleContextHolder.getLocale());
     }
 
 
     public Long getObjectSize(String path, String type) {
-        try {
-            if (type.equals("file")) {
-                return minioClient.statObject(StatObjectArgs.builder()
-                                .bucket(minioProperties.getBucket())
-                                .object(path).build())
-                        .size();
-            }
-            return getAllObjectInFolder(path, true)
-                    .stream()
-                    .mapToLong(item -> item.size())
-                    .sum();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return 0L;
-        }
-    }
-    public Long getPercent(String userFolder){
-       return getUsedMemory(userFolder) * 100 / MAX_MEMORY;
+            return switch (type){
+                case "file" -> minioRepository.getObjectSize(path);
+                case "folder" -> minioRepository.getAllObjectInFolder(path, true)
+                        .stream()
+                        .mapToLong(item -> item.size())
+                        .sum();
+                default -> throw new IllegalStateException("Unexpected value: " + type);
+            };
     }
 
+    public Long getPercentUsedMemory(String userFolder) {
+        return getUsedMemory(userFolder) * 100 / MAX_MEMORY;
+    }
 
-    private void copyFile(String currentName, String newName) {
-        var newFilePath = FolderUtil.getParentFolderPath(currentName) + "/" + newName + FileUtil.getFileType(currentName);
-        if (FileUtil.getFileName(currentName, false).equals(newName) || isFileExist(newFilePath)) {
-            throw new MinioDuplicateNameException(getErrorMessage("duplicate"));
+    public String getFileCopyPath(String referer, MultipartFile file) {
+        var count = 1;
+        var filePath = UriEncoder.decode(getPathParam(referer)) + "/" + file.getOriginalFilename();
+        var newFilePath = filePath;
+        while (isFileExist(newFilePath)) {
+            newFilePath = filePath.substring(0, filePath.indexOf('.')) + "(" + count++ + ")" + getFileType(file.getOriginalFilename());
         }
-        try {
-            minioClient.copyObject(CopyObjectArgs.builder()
-                    .source(CopySource.builder()
-                            .bucket(minioProperties.getBucket())
-                            .object(currentName)
-                            .build())
-                    .bucket(minioProperties.getBucket())
-                    .object(newFilePath)
-                    .build());
-        } catch (Exception e) {
-            throw new MinioCopyException(getErrorMessage("copy") + e.getMessage());
-        }
+        return newFilePath;
     }
 
     private void removeObject(String fileName) {
         try {
-            minioClient.removeObject(RemoveObjectArgs.builder()
-                    .bucket(minioProperties.getBucket())
-                    .object(fileName)
-                    .build());
-        } catch (Exception e) {
-            throw new MinioRemoveException(getErrorMessage("remove") + e.getMessage());
-        }
+        minioRepository.removeObject(fileName);
+    } catch (Exception e) {
+        throw new MinioRemoveException(getErrorMessage("remove") + e.getMessage());
+    }
     }
 
     private boolean isNameCorrect(String name) {
         return name.matches("^[\\p{L}0-9_-]{1,30}$");
     }
 
-    private void copyFolder(String folderPath, String newName) {
-        var newPathFolder = FolderUtil.getNewPathFolder(folderPath, newName);
-        if (folderPath.equals(newPathFolder) || isFolderExist(newPathFolder)) {
-            throw new MinioDuplicateNameException(getErrorMessage("duplicate"));
-        }
-        try {
-            for (Item object : getAllObjectInFolder(folderPath, true)) {
-                minioClient.copyObject(CopyObjectArgs.builder()
-                        .source(CopySource.builder()
-                                .bucket(minioProperties.getBucket())
-                                .object(object.objectName())
-                                .build())
-                        .bucket(minioProperties.getBucket())
-                        .object(object.objectName().replace(folderPath, newPathFolder))
-                        .build());
-            }
-        } catch (Exception e) {
-            throw new MinioCopyException(getErrorMessage("copy") + e.getMessage());
-        }
-    }
-
-    private List<Item> getAllObjectInFolder(String folderName, Boolean recursive) {
-        var results = minioClient.listObjects(ListObjectsArgs.builder()
-                .bucket(minioProperties.getBucket())
-                .prefix(folderName + "/")
-                .recursive(recursive)
-                .build());
-        var objects = new ArrayList<Item>();
-        for (Result<Item> result : results) {
-            try {
-                objects.add(result.get());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        return objects;
-    }
 
     private String getErrorMessage(String errorType) {
         return messageSource.getMessage("error.message." + errorType, null, LocaleContextHolder.getLocale());
     }
+
 
 }

@@ -64,7 +64,7 @@ public class IndexController {
                 "userFolder", userFolder,
                 "path", path,
                 "processText", minioService.getProcessText(userFolder),
-                "progressValue", minioService.getPercent(userFolder)
+                "progressValue", minioService.getPercentUsedMemory(userFolder)
         ));
         return "index";
     }
@@ -88,7 +88,7 @@ public class IndexController {
                 .sum());
         var uploadFiles = files.stream()
                 .map(file -> {
-                    minioService.uploadFile(file, getFilePath(referer, file));
+                    minioService.uploadFile(file, minioService.getFileCopyPath(referer, file));
                     return file.getOriginalFilename();
                 })
                 .collect(Collectors.toList());
@@ -100,7 +100,7 @@ public class IndexController {
     public String createFolder(String folderName,
                                RedirectAttributes redirectAttributes,
                                @RequestHeader(value = "Referer") String referer) {
-        minioService.createEmptyFolderWithName(getPathParam(referer), folderName);
+        minioService.createEmptyFolder(getPathParam(referer), folderName);
         addRedirectAttributes(redirectAttributes, "create", List.of(folderName));
         return "redirect:" + referer;
     }
@@ -173,16 +173,5 @@ public class IndexController {
     private String getName(String path, String type) {
         return type.equals("folder") ? getNameFolder(path) : getFileName(path, true);
     }
-
-    private String getFilePath(String referer, MultipartFile file) {
-        var count = 1;
-        var filePath = UriEncoder.decode(getPathParam(referer)) + "/" + file.getOriginalFilename();
-        var newFilePath = filePath;
-        while (minioService.isFileExist(newFilePath)) {
-            newFilePath = filePath.substring(0, filePath.indexOf('.')) + "(" + count++ + ")" + getFileType(file.getOriginalFilename());
-        }
-        return newFilePath;
-    }
-
 
 }

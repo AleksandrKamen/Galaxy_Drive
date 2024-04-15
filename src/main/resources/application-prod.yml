@@ -35,7 +35,7 @@ spring:
     redis:
       host: redis
 minio:
-  url: http://minio:${MINIO_PORT}
+  url: http://minio:9000
   bucket: ${MINIO_BUCKET}
   accessKey: ${MINIO_ROOT_USER}
   secretKey: ${MINIO_ROOT_PASSWORD}
