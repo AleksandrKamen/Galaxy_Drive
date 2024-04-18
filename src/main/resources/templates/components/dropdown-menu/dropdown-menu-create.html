@@ -28,11 +28,10 @@
                 <label class="dropdown-item" for="upload-folder">
                     <i class="fa-solid fa-folder-open me-2"></i><span th:text="#{upload.folder}"></span>
                 </label>
-                <input type="file" id="upload-folder" name="files" webkitdirectory onchange="this.form.submit()">
+                <input type="file" id="upload-folder" name="files" webkitdirectory onchange="checkFileSize(this)">
             </form>
         </li>
     </ul>
 </div>
-
 <span id="messageMaxSize" class="d-none" th:text="#{maxSize.message}"></span>
 </body>

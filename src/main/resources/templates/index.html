@@ -12,11 +12,11 @@
     <th:block th:insert="~{components/dropdown-menu/dropdown-menu-create}"></th:block>
     <div class="progress-container">
         <div class="progress">
-            <div class="progress-bar" role="progressbar" th:style="'width: ' + ${progressValue} + '%'"
-                 th:aria-valuenow="${progressValue}" aria-valuemin="0" aria-valuemax="100"
-                 th:text="${progressValue} + '%'"></div>
+            <div class="progress-bar" role="progressbar" th:style="'width: ' + ${percentUsedMemory} + '%'"
+                 th:aria-valuenow="${percentUsedMemory}" aria-valuemin="0" aria-valuemax="100"
+                 th:text="${percentUsedMemory} + '%'"></div>
         </div>
-        <span th:text="${processText}"></span>
+        <span th:text="${memoryText}"></span>
     </div>
 
     <h4 class="text-center" th:text="#{home.page.greetings}"></h4>
@@ -24,7 +24,8 @@
     <th:block th:insert="~{components/breadcrumbs}"></th:block>
     <th:block th:insert="~{components/files-type}"></th:block>
 
-    <div class="table-container">
+    <div class="table-container" th:with="userFirstName=${user.getFirstName()},
+                                          userDefaultName=#{user.default.name}">
         <table class="table table-hover">
             <th:block th:insert="~{components/column-names}"></th:block>
             <tbody>
@@ -41,7 +42,7 @@
                 <td>
                     <a class="nav-link" href="#" data-toggle="tooltip" th:title="#{navbar.personal.account}"
                        data-bs-toggle="modal" data-bs-target="#modal-cart">
-                        <span th:text="${user.getFirstName() != null and user.getFirstName() != ''}  ? ${user.getFirstName()} : #{user.default.name}"></span>
+                        <span th:text="${userFirstName ?: userDefaultName}"></span>
                     </a>
                 </td>
                 <td>-</td>
@@ -57,6 +58,7 @@
             </tr>
             <tr class="files" th:each="file:${allFilesInFolder}"
                 th:with="fileName=${file.getName()},
+                         filePath=${file.getPath()},
                          parentFolderPath=${file.getParentFolderPath()},
                          fileType=${file.getType()},
                          fileSize=${file.getSize()},
@@ -68,7 +70,7 @@
                 <td>
                     <a class="nav-link" href="#" data-toggle="tooltip" th:title="#{navbar.personal.account}"
                        data-bs-toggle="modal" data-bs-target="#modal-cart">
-                        <span th:text="${user.getFirstName() != null and user.getFirstName() != ''}  ? ${user.getFirstName()} : #{user.default.name}"></span>
+                        <span th:text="${userFirstName ?: userDefaultName}"></span>
                     </a>
                 </td>
                 <td th:text="${lastModified}"></td>
@@ -85,6 +87,11 @@
             </tbody>
         </table>
     </div>
+    <div class="empty-drive-container" th:if="${allFoldersInFolder.isEmpty() && allFilesInFolder.isEmpty()}">
+        <img class="empty-drive-image" src="/picture/empty-drive-image.png">
+    </div>
+
+
 </section>
 
 <div th:insert="~{components/modal/modal-copy}"></div>

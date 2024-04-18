@@ -9,11 +9,12 @@
 <th:block th:insert="~{components/navbar}"></th:block>
 
 <section class="main-content">
-
     <th:block th:insert="~{components/search-form}"></th:block>
     <h4 class="text-center mt-5" th:text="#{search.searching.results}"></h4>
     <div class="table-container">
-        <table class="table table-hover">
+        <table class="table table-hover" th:with="userFirstName=${session.user.getFirstName()},
+                                                  userFolder=${session.userFolder},
+                                                  userDefaultName=#{user.default.name}">
             <th:block th:insert="~{components/column-names}"></th:block>
             <tbody>
             <tr class="folders" th:each="folder:${foundFolders}"
@@ -29,7 +30,7 @@
                 <td>
                     <a class="nav-link" href="#" data-toggle="tooltip" th:title="#{navbar.personal.account}"
                        data-bs-toggle="modal" data-bs-target="#modal-cart">
-                        <span th:text="${user.getFirstName() != null and user.getFirstName() != ''}  ? ${user.getFirstName()} : #{user.default.name}"></span>
+                        <span th:text="${userFirstName ?: userDefaultName}"></span>
                     </a>
                 </td>
                 <td>-</td>
@@ -45,6 +46,7 @@
             </tr>
             <tr class="files" th:each="file:${foundFiles}"
                 th:with="fileName=${file.getName()},
+                         filePath=${file.getPath()},
                          parentFolderPath=${file.getParentFolderPath()},
                          fileType=${file.getType()},
                          fileSize=${file.getSize()},
@@ -56,7 +58,7 @@
                 <td>
                     <a class="nav-link" href="#" data-toggle="tooltip" th:title="#{navbar.personal.account}"
                        data-bs-toggle="modal" data-bs-target="#modal-cart">
-                        <span th:text="${user.getFirstName() != null and user.getFirstName() != ''}  ? ${user.getFirstName()} : #{user.default.name}"></span>
+                        <span th:text="${userFirstName ?: userDefaultName}"></span>
                     </a>
                 </td>
                 <td th:text="${lastModified}"></td>

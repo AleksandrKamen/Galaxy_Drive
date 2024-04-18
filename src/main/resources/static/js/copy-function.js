@@ -10,7 +10,7 @@ function copyObject(){
             var copyName = '';
 
             if (type === 'file') {
-                var indexOf = fullName.indexOf('.');
+                var indexOf = fullName.lastIndexOf('.');
                 var lastIndexOf = fullName.lastIndexOf("/") + 1;
                 copyName = fullName.substring(indexOf, lastIndexOf);
             } else if (type === 'folder') {

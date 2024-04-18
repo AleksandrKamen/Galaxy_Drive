@@ -2,10 +2,10 @@
 <div class="breadcrumbs" th:each="parentFolder:${parentFolders}">
     <a th:href="'/?path=' + ${parentFolder}">
 
-                <span th:if="${parentFolder.equals(userFolderName)}">
+                <span th:if="${parentFolder.equals(userFolder)}">
                     <span th:text="#{user.folder}"></span>
                 </span>
-        <span th:unless="${parentFolder.equals(userFolderName)}">
+        <span th:unless="${parentFolder.equals(userFolder)}">
                     <span th:text="${parentFolder.substring(parentFolder.lastIndexOf('/') + 1)}"></span>
                 </span>
 

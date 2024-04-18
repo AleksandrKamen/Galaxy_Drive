@@ -9,7 +9,7 @@ function renameObject() {
             var newName = '';
 
             if (type === 'file') {
-                var indexOf = fullName.indexOf('.');
+                var indexOf = fullName.lastIndexOf('.');
                 var lastIndexOf = fullName.lastIndexOf("/") + 1;
                 newName = fullName.substring(indexOf, lastIndexOf);
             } else if (type === 'folder') {

@@ -1,13 +1,14 @@
 function checkFileSize(input) {
-    const messageMaxSize = document.getElementById('messageMaxSize').textContent;
-
+    const maxTotalSize = 100 * 1024 * 1024;
     if (input.files.length > 0) {
-        for (var i = 0; i < input.files.length; i++) {
-            if (input.files[i].size > 104857600) {
-                alert(messageMaxSize);
-                return false;
-            }
+        let totalSize = 0;
+        for (let i = 0; i < input.files.length; i++) {
+            totalSize += input.files[i].size;
+        }
+        if (totalSize > maxTotalSize) {
+            alert(document.getElementById('messageMaxSize').textContent);
+            return false;
         }
     }
-    document.getElementById('upload-form-file').submit();
+    input.parentNode.submit();
 }
