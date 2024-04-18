@@ -2,6 +2,7 @@ package com.galaxy.galaxy_drive.service.integration;
 
 import com.galaxy.galaxy_drive.exception.user.UserAlreadyExistsException;
 import com.galaxy.galaxy_drive.model.dto.user.UserCreateDto;
+import com.galaxy.galaxy_drive.model.dto.user.UserReadDto;
 import com.galaxy.galaxy_drive.model.entity.user.Role;
 import com.galaxy.galaxy_drive.model.entity.user.SignupMethod;
 import com.galaxy.galaxy_drive.model.repository.UserRepository;
@@ -9,11 +10,38 @@ import com.galaxy.galaxy_drive.service.user.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+import org.testcontainers.containers.MinIOContainer;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.*;
 
-class UserServiceIntegrationIT extends IntegrationTestBase {
+@Testcontainers
+@SpringBootTest
+class UserServiceIntegrationIT {
+    @Container
+    @ServiceConnection
+    static PostgreSQLContainer<?> container = new PostgreSQLContainer<>("postgres");
+    @Container
+    static MinIOContainer minIOContainer = new MinIOContainer("minio/minio")
+            .withUserName("user")
+            .withPassword("password");
+
+
+    @DynamicPropertySource
+    static void datasourceProperties(DynamicPropertyRegistry registry) {
+        registry.add("minio.url", minIOContainer::getS3URL);
+        registry.add("minio.access-key", () -> "user");
+        registry.add("minio.secret-key", () -> "password");
+    }
+
+
     @Autowired
     UserService userService;
     @Autowired
@@ -25,6 +53,7 @@ class UserServiceIntegrationIT extends IntegrationTestBase {
     void cleanup() {
         userRepository.deleteAll();
     }
+
     @Test
     void createUserSuccessful() {
         userService.create(new UserCreateDto(TEST_EMAIL, TEST_PASSWORD, TEST_PASSWORD));
@@ -43,7 +72,7 @@ class UserServiceIntegrationIT extends IntegrationTestBase {
     @Test
     void updateUser() {
         userService.create(new UserCreateDto(TEST_EMAIL, TEST_PASSWORD, TEST_PASSWORD));
-        userService.updateUser(TEST_EMAIL, "testName", "testLastName");
+        userService.updateUser(new UserReadDto(1L, TEST_EMAIL, "testName", "testLastName"));
         var actualResult = userService.findByUserName(TEST_EMAIL);
         assertThat(actualResult.getFirstName()).isEqualTo("testName");
         assertThat(actualResult.getLastName()).isEqualTo("testLastName");

@@ -9,6 +9,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.web.servlet.MockMvc;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -53,6 +54,7 @@ class RegistrationControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("registration"));
     }
+
     @Test
     void registration_Password_and_confirmPassword_notEquals() throws Exception {
         mockMvc.perform(post("/registration")
@@ -64,6 +66,7 @@ class RegistrationControllerTest {
                 .andExpect(flash().attributeExists("errors"));
         verify(userService, never()).create(any());
     }
+
     @Test
     void registration_shortPassword() throws Exception {
         mockMvc.perform(post("/registration")
@@ -99,7 +102,6 @@ class RegistrationControllerTest {
                 .andExpect(flash().attributeExists("errors"));
         verify(userService, never()).create(any());
     }
-
 
 
 }
