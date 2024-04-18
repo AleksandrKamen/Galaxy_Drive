@@ -18,12 +18,13 @@ public class LoggingControllerAspect {
     }
 
     @AfterReturning(pointcut = "com.galaxy.galaxy_drive.aop.CommonAspect.isPostMethod()", returning = "redirectPageName")
-    public void addLogingPostMappingMethods(JoinPoint joinPoint ,String redirectPageName) {
-        log.info("method {} invoke {} page", joinPoint.getSignature().getName(),  redirectPageName);
+    public void addLogingPostMappingMethods(JoinPoint joinPoint, String redirectPageName) {
+        log.info("method {} invoke {} page", joinPoint.getSignature().getName(), redirectPageName);
     }
+
     @AfterThrowing(pointcut = "com.galaxy.galaxy_drive.aop.CommonAspect.isControllerLayer()", throwing = "ex")
     public void addLogingThrowingException(JoinPoint joinPoint, Exception ex) {
-        log.error("error in method {}, message -  {}", joinPoint.getSignature().getName(),  ex.getMessage());
+        log.error("error in method {}, message -  {}", joinPoint.getSignature().getName(), ex.getMessage());
     }
 
 }

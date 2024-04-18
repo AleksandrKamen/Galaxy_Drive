@@ -6,7 +6,7 @@
     </button>
     <ul class="dropdown-menu">
         <li>
-            <a class="dropdown-item" th:href="@{'/downloadFolder?folderName='+${folderPath}}">
+            <a class="dropdown-item" th:href="@{'/downloadFolder?path=' + ${folderPath} + '&name=' + ${folderName} }">
                 <i class="fa-solid fa-download me-2"></i> <span th:text="#{download.btn}"></span>
             </a>
         </li>

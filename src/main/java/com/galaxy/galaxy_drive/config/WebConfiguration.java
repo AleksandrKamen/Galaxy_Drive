@@ -17,14 +17,16 @@ public class WebConfiguration implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(localeChangeInterceptor());
     }
+
     @Bean
-    public LocaleChangeInterceptor localeChangeInterceptor (){
+    public LocaleChangeInterceptor localeChangeInterceptor() {
         var interceptor = new LocaleChangeInterceptor();
         interceptor.setParamName("locale");
         return interceptor;
     }
+
     @Bean
-    public LocaleResolver localeResolver(){
+    public LocaleResolver localeResolver() {
         var localeResolver = new CookieLocaleResolver();
         localeResolver.setDefaultLocale(Locale.US);
         return localeResolver;

@@ -26,6 +26,7 @@ public class RegistrationController {
     public String registrationPage() {
         return "registration";
     }
+
     @PostMapping
     public String registration(@Validated UserCreateDto user,
                                BindingResult bindingResult,

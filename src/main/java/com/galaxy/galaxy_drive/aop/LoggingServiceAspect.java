@@ -114,15 +114,14 @@ public class LoggingServiceAspect {
     }
 
     @AfterReturning("com.galaxy.galaxy_drive.aop.CommonAspect.isCreateFolderMethod(parentFolder, folderName)")
-    public void addLogingAfterCreateFolder(String parentFolder,  String folderName) {
+    public void addLogingAfterCreateFolder(String parentFolder, String folderName) {
         log.info("folder with name {} was created, parent folder: {}", folderName, parentFolder);
     }
 
     @AfterThrowing(pointcut = "com.galaxy.galaxy_drive.aop.CommonAspect.isCreateFolderMethod(parentFolder, folderName)", throwing = "ex")
-    public void addLogingAfterThrowingCreateFolder(String parentFolder,  String folderName, Exception ex) {
-        log.error("error occurred while create folder with name {} in to {}: {}", folderName, parentFolder,  ex.getMessage());
+    public void addLogingAfterThrowingCreateFolder(String parentFolder, String folderName, Exception ex) {
+        log.error("error occurred while create folder with name {} in to {}: {}", folderName, parentFolder, ex.getMessage());
     }
-
 
 
 }

@@ -1,4 +1,5 @@
 package com.galaxy.galaxy_drive.util;
+
 import lombok.experimental.UtilityClass;
 
 @UtilityClass

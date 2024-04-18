@@ -7,19 +7,19 @@
 
     <ul class="dropdown-menu">
         <li>
-            <a class="dropdown-item" th:href="@{'/downloadFile?fileName='+${file.getPath()}}">
+            <a class="dropdown-item" th:href="@{'/downloadFile?path=' + ${filePath} + '&name=' + ${fileName} }">
                 <i class="fa-solid fa-download me-2"></i> <span th:text="#{download.btn}"></span>
             </a>
         </li>
         <li>
             <button id="rename-file-btn" class="dropdown-item rename-btn" data-bs-toggle="modal"
-                    data-bs-target="#renameModal" th:data-object-name="${file.getPath()}" th:data-object-type="file">
+                    data-bs-target="#renameModal" th:data-object-name="${filePath}" th:data-object-type="file">
                 <i class="fa-solid fa-pencil me-2"></i> <span th:text="#{rename.modal.title}"></span>
             </button>
         </li>
         <li>
             <button id="copy-file-btn" class="dropdown-item copy-btn" data-bs-toggle="modal"
-                    data-bs-target="#copyModal" th:data-object-name="${file.getPath()}" th:data-object-type="file">
+                    data-bs-target="#copyModal" th:data-object-name="${filePath}" th:data-object-type="file">
                 <i class="fa-solid fa-copy me-2"></i><span th:text="#{copy.modal.copy}"></span>
             </button>
         </li>
@@ -29,7 +29,7 @@
         <li>
             <form th:action="@{/delete}" method="post">
                 <input type="hidden" name="type" value="file">
-                <input type="hidden" id="delete-file" name="objectName" th:value="${file.getPath()}">
+                <input type="hidden" id="delete-file" name="objectName" th:value="${filePath}">
                 <button class="dropdown-item" type="submit">
                     <i class="fa-solid fa-trash-can me-2"></i><span th:text="#{delete.btn}"></span>
                 </button>

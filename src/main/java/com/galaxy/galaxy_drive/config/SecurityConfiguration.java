@@ -26,6 +26,7 @@ public class SecurityConfiguration {
         http.authorizeHttpRequests((authz) -> authz
                         .requestMatchers("/login", "/registration").permitAll()
                         .requestMatchers("/css/**", "/picture/**", "/js/**").permitAll()
+                        .requestMatchers("/favicon.ico").permitAll()
                         .anyRequest().authenticated())
                 .formLogin(login -> login.loginPage("/login")
                         .defaultSuccessUrl("/", true))
