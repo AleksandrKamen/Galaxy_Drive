@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:postgresql://postgres_db:5432/${POSTGRES_DATABASE}
-    username: ${POSTGRES_USER}
-    password: ${POSTGRES_PASSWORD}
+    url: jdbc:postgresql://postgres_db:5432/users
+    username: user
+    password: password
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
@@ -27,6 +27,7 @@ spring:
             scope:
               - user:email
               - read:user
+
   servlet:
     multipart:
       max-request-size: 100MB
@@ -36,10 +37,11 @@ spring:
       host: redis
 minio:
   url: http://minio:9000
-  bucket: ${MINIO_BUCKET}
-  accessKey: ${MINIO_ROOT_USER}
-  secretKey: ${MINIO_ROOT_PASSWORD}
-  memoryLimit: ${MINIO_LIMIT}
+  bucket: user-files
+  accessKey: minio_user_dev
+  secretKey: minio_password_dev
+  memoryLimit: 1073741824
+
 
 
 

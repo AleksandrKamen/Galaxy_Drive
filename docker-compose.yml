@@ -2,7 +2,6 @@ version: '3.8'
 
 services:
   galaxy_drive:
-    build: .
     image: aleksandrkamen/galaxy_drive
     restart: always
     depends_on:
@@ -19,6 +18,7 @@ services:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
       MINIO_BUCKET: ${MINIO_BUCKET}
+      MINIO_LIMIT: ${MINIO_LIMIT}
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
       GOOGLE_REDIRECT_URI: ${GOOGLE_REDIRECT_URI}

@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  galaxy_drive:
+    build: .
+    restart: always
+    depends_on:
+      - postgres_db
+      - redis
+      - minio
+    ports:
+      - '8080:8080'
+    environment:
+      SPRING_PROFILES_ACTIVE: "dev"
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      GOOGLE_REDIRECT_URI: ${GOOGLE_REDIRECT_URI}
+      GIT_HUB_CLIENT_ID: ${GIT_HUB_CLIENT_ID}
+      GIT_HUB_CLIENT_SECRET: ${GIT_HUB_CLIENT_SECRET}
+      GIT_HUB_REDIRECT_URI: ${GIT_HUB_REDIRECT_URI}
+
+  postgres_db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: 'user'
+      POSTGRES_PASSWORD: 'password'
+      POSTGRES_DB: 'users'
+
+  redis:
+    image: redis
+    restart: always
+
+  minio:
+    image: minio/minio
+    restart: always
+    command: server /data --console-address ":9092"
+    environment:
+      MINIO_ROOT_USER: 'minio_user_dev'
+      MINIO_ROOT_PASSWORD: 'minio_password_dev'
+    ports:
+      - '9000:9000'
+      - '9092:9092'
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - '8082:8080'
+
+

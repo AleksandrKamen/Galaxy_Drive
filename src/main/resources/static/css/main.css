@@ -124,6 +124,15 @@ a:hover {
     max-width: 60%;
     max-height: 40%;
 }
+
+.empty-drive-container{
+    text-align: center;
+}
+.empty-drive-image{
+    max-width: 10%;
+    max-height: 10%;
+
+}
 /*error*/
 
 /*Main*/
